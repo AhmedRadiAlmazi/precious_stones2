@@ -225,6 +225,20 @@
                     </div>
                 </div>
                 
+                <!-- القائمة -->
+                <nav class="hidden md:flex space-x-6 rtl:space-x-reverse">
+                    <a href="../index.html" class="hover:text-yellow-500 transition">الرئيسية</a>
+                    <a href="./auction.html" class="hover:text-yellow-500 transition">المزادات</a>
+                    <a href="./theshop.html" class="hover:text-yellow-500 transition">المتجر</a>
+                    <a href="#" class="hover:text-yellow-500 transition">البائعون</a>
+                    <a href="#" class="hover:text-yellow-500 transition">الدعم</a>
+                </nav>
+
+                <!-- زر القائمة المحمولة -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-full hover:bg-tertiary transition">
+                    <i class="fas fa-bars text-secondary"></i>
+                </button>
+
                 <!-- الأيقونات -->
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <!-- زر تبديل الوضع -->
@@ -249,6 +263,19 @@
                 </div>
             </div>
             
+            <!-- القائمة المحمولة -->
+            <div id="mobile-menu" class="md:hidden bg-secondary border-t border-color hidden">
+                <div class="container mx-auto px-4 py-4">
+                    <nav class="flex flex-col space-y-4">
+                        <a href="../index.html" class="hover:text-yellow-500 transition">الرئيسية</a>
+                        <a href="./auction.html" class="hover:text-yellow-500 transition">المزادات</a>
+                        <a href="./theshop.html" class="hover:text-yellow-500 transition">المتجر</a>
+                        <a href="#" class="hover:text-yellow-500 transition">البائعون</a>
+                        <a href="#" class="hover:text-yellow-500 transition">الدعم</a>
+                    </nav>
+                </div>
+            </div>
+
             <!-- شريط البحث للجوال -->
             <div class="mt-4 md:hidden">
                 <div class="relative">
@@ -1038,6 +1065,12 @@
         mobileFilterToggle.addEventListener('click', openSidebar);
         closeSidebar.addEventListener('click', closeSidebarFunc);
         sidebarOverlay.addEventListener('click', closeSidebarFunc);
+        // تفعيل زر القائمة المحمولة إذا وُجد
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if(mobileMenuToggle && mobileMenu){
+            mobileMenuToggle.addEventListener('click', ()=>{ mobileMenu.classList.toggle('hidden'); });
+        }
         
         // تأثيرات الريبل للأزرار
         const rippleButtons = document.querySelectorAll('.ripple');
