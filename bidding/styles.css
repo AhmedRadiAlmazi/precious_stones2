@@ -1,0 +1,90 @@
+:root{
+  --bg:#0f0f10;
+  --charcoal:#0b0b0c;
+  --gold:#caa34a;
+  --gold-soft:#d6b75a;
+  --muted:#9a9a9a;
+}
+*{box-sizing:border-box}
+html, body{height:100%;margin:0;font-family:'Cairo', 'IBM Plex Sans Arabic', sans-serif;background:linear-gradient(180deg,var(--bg),#0a0a0b);color:#fff}
+.header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.logo{font-weight:700;color:var(--gold);font-size:clamp(16px,1.8vw,22px);letter-spacing:1px}
+.logo span{color:#fff;font-weight:400;margin-right:6px}
+.header-actions{display:flex;gap:18px;align-items:center}
+.ticker{background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(202,163,74,0.03));padding:8px 12px;border-radius:8px;color:var(--gold-soft);font-size:13px}
+.icons{opacity:0.9}
+
+.container{max-width:1200px;margin:22px auto;display:flex;flex-direction:column;gap:20px;padding:0 16px}
+.auction-panel{display:flex;gap:18px;align-items:stretch}
+.gallery{flex:1;position:relative;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#111, #0b0b0c);min-height:360px;display:flex;align-items:center;justify-content:center}
+.gallery img{max-width:100%;max-height:78%;z-index:4;transition:transform .35s ease;object-fit:contain;display:block}
+.gallery .spotlight{position:absolute;left:50%;top:30%;transform:translateX(-50%);width:60%;height:50%;background:radial-gradient(ellipse at center, rgba(255,240,200,0.06), transparent 40%);z-index:2}
+#particles{position:absolute;inset:0;z-index:1}
+#particles{pointer-events:none}
+
+.details{width:380px;max-width:420px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.stone-title{margin:0;font-size:clamp(18px,2.6vw,22px);color:var(--gold)}
+.meta{color:var(--muted);font-size:clamp(12px,1.4vw,14px)}
+.seal{background:linear-gradient(90deg,var(--gold-soft),var(--gold));padding:4px 8px;border-radius:8px;color:#111;font-weight:600;margin-right:6px}
+
+.price-block{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px}
+.current-price{font-size:13px;color:var(--muted)}
+.price-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.price{font-size:clamp(20px,3.2vw,32px);font-weight:700;color:var(--gold)}
+.you-top{background:linear-gradient(90deg,#f8e9c3,#f2d07b);color:#111;padding:6px 8px;border-radius:10px;font-weight:700}
+.hidden{display:none}
+
+.countdown{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+.countdown .status{color:var(--muted);font-size:13px}
+#countdown-timer{font-weight:700;color:#fff;background:linear-gradient(90deg, rgba(202,163,74,0.12), rgba(202,163,74,0.04));padding:6px 10px;border-radius:8px;min-width:72px;text-align:center}
+
+.escrow-steps{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.escrow-steps .step{flex:1 1 18%;text-align:center;padding:6px 6px;border-radius:8px;background:rgba(255,255,255,0.01);font-size:12px;color:var(--muted)}
+.escrow-steps .step.active{background:linear-gradient(90deg, rgba(202,163,74,0.16), rgba(202,163,74,0.06));color:var(--gold)}
+
+.bid-controls{display:flex;gap:8px;margin-top:12px}
+.bid-controls input{flex:1;padding:12px;border-radius:10px;border:none;background:rgba(255,255,255,0.02);color:#fff;font-size:14px}
+.btn-gold{background:linear-gradient(90deg,var(--gold),var(--gold-soft));border:none;padding:12px 16px;border-radius:12px;color:#111;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(202,163,74,0.12);transition:transform .12s ease}
+.btn-gold:active{transform:translateY(2px)}
+
+.bid-history{margin-top:14px}
+.bid-history h3{margin:0 0 6px 0;font-size:14px;color:var(--muted)}
+.bid-history ul{list-style:none;padding:0;margin:0;max-height:120px;overflow:auto}
+.bid-history li{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,0.02);font-size:13px}
+
+.live-feed{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:12px;border-radius:10px}
+.feed-header{font-weight:700;color:var(--gold);margin-bottom:8px}
+.feed{display:flex;gap:8px;flex-wrap:wrap}
+.feed .item{background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:8px;font-size:13px}
+
+/* small responsive */
+/* Responsive breakpoints */
+@media (max-width:1100px){
+  .container{padding:0 14px}
+}
+@media (max-width:900px){
+  .auction-panel{flex-direction:column}
+  .details{width:100%;max-width:100%}
+  .gallery{min-height:320px}
+}
+@media (max-width:600px){
+  .header{padding:12px 12px}
+  .logo{font-size:18px}
+  .gallery{min-height:260px}
+  .stone-title{font-size:18px}
+  .price{font-size:20px}
+  .bid-controls{position:fixed;left:12px;right:12px;bottom:12px;padding:12px;background:linear-gradient(90deg, rgba(11,11,12,0.92), rgba(11,11,12,0.95));box-shadow:0 -8px 30px rgba(0,0,0,0.6);border-radius:14px;z-index:120;display:flex;align-items:center}
+  .bid-controls input{flex:1;margin-right:8px}
+  body{padding-bottom:96px} /* allow space for fixed bar on small screens */
+}
+
+/* subtle floating animation for img */
+.gallery img:hover{transform:translateY(-6px) scale(1.02)}
+
+/* countdown urgent state */
+.urgent{animation:pulse 1s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+
+/* accessibility: larger tap targets */
+button, input[type="number"]{touch-action:manipulation}
+

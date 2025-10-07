@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المتجر | جوهرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="responsive.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            500: '#D4AF37',
+                            600: '#B8860B',
+                        },
+                        charcoal: {
+                            800: '#1a1a1a',
+                            900: '#0d0d0d',
+                        }
+                    },
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --charcoal: #1a1a1a;
+            --light-charcoal: #2d2d2d;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        }
+        
+        .gold-text {
+            color: var(--gold);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.1), 0 5px 10px -5px rgba(212, 175, 55, 0.04);
+        }
+        
+        .glow {
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .certification-seal {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 60px;
+            height: 60px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-15deg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .theme-transition {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+        }
+        
+        .light-theme {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+        }
+        
+        .dark-theme {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
+        }
+        
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-secondary { background-color: var(--bg-secondary); }
+        .bg-tertiary { background-color: var(--bg-tertiary); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .border-color { border-color: var(--border-color); }
+        
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-gold);
+        }
+        
+        /* تأثيرات للفلتر في الجوال */
+        .filter-mobile {
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .filter-mobile.open {
+            transform: translateY(0);
+        }
+        
+        /* تحسينات للشريط الجانبي في الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .sidebar-mobile {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                height: 100%;
+                transition: right 0.3s ease;
+                z-index: 60;
+                overflow-y: auto;
+            }
+            
+            .sidebar-mobile.open {
+                right: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 50;
+                display: none;
+            }
+            
+            .sidebar-overlay.open {
+                display: block;
+            }
+        }
+
+        /* تأثيرات خاصة للصور */
+        .product-image {
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        /* تأثيرات للبطاقات */
+        .product-card {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="theme-transition bg-primary text-primary">
+    <!-- الهيدر -->
+    <header class="bg-secondary sticky top-0 z-50 shadow-lg border-b border-color">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- الشعار -->
+                <div class="flex items-center">
+                    <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
+                        <i class="fas fa-gem text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                </div>
+                
+                <!-- شريط البحث -->
+                <div class="flex-1 max-w-xl mx-4 hidden md:block">
+                    <div class="relative">
+                        <input type="text" placeholder="ابحث في المتجر..." class="w-full bg-tertiary text-primary rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-yellow-500 border border-color">
+                        <button class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-yellow-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- الأيقونات -->
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <!-- زر تبديل الوضع -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-tertiary transition">
+                        <i id="theme-icon" class="fas fa-moon text-secondary"></i>
+                    </button>
+                    
+                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-bell text-secondary"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-heart text-secondary"></i>
+                    </button>
+                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-shopping-cart text-secondary"></i>
+                        <span class="absolute top-0 right-0 w-4 h-4 bg-yellow-500 text-black text-xs rounded-full flex items-center justify-center">3</span>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-user text-secondary"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- شريط البحث للجوال -->
+            <div class="mt-4 md:hidden">
+                <div class="relative">
+                    <input type="text" placeholder="ابحث في المتجر..." class="w-full bg-tertiary text-primary rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-yellow-500 border border-color">
+                    <button class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-yellow-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- قسم البطل -->
+    <section class="relative bg-tertiary py-12 md:py-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4 gold-text">اكتشف كنوزنا النادرة</h1>
+                    <p class="text-xl mb-8 text-secondary">مجموعة فريدة من الأحجار الكريمة متاحة للشراء المباشر بأسعار تنافسية</p>
+                    <div class="flex space-x-4 rtl:space-x-reverse">
+                        <button class="gold-gradient text-white font-bold py-3 px-6 rounded-full ripple">
+                            تسوق الآن
+                        </button>
+                        <button class="bg-transparent border-2 border-yellow-500 text-yellow-500 font-bold py-3 px-6 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                            عرض العروض
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <div class="bg-secondary rounded-xl overflow-hidden h-32 md:h-40 border border-color">
+                                <img src="./imges/زمرد كولومبي نقي.jpg" alt="زمرد" class="w-full h-full object-cover">
+                            </div>
+                            <div class="bg-secondary rounded-xl overflow-hidden h-24 md:h-32 border border-color">
+                                <img src="./imges/زمرد كولومبي نقي.jpg" alt="ياقوت" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                        <div class="space-y-4 mt-8">
+                            <div class="bg-secondary rounded-xl overflow-hidden h-24 md:h-32 border border-color">
+                                <img src="./imges/ألماس وردي نادر.jpeg" alt="ألماس" class="w-full h-full object-cover">
+                            </div>
+                            <div class="bg-secondary rounded-xl overflow-hidden h-32 md:h-40 border border-color">
+                                <img src="./imges/ياقوت أزرق نادر.jpeg" alt="ياقوت وردي" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- شريط التصنيفات -->
+    <div class="bg-secondary border-b border-color py-4 sticky top-16 md:top-20 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center overflow-x-auto">
+                <div class="flex space-x-4 rtl:space-x-reverse pb-2">
+                    <button class="whitespace-nowrap gold-gradient text-white px-4 py-2 rounded-full text-sm font-bold">
+                        جميع المنتجات
+                    </button>
+                    <button class="whitespace-nowrap bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color">
+                        ألماس
+                    </button>
+                    <button class="whitespace-nowrap bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color">
+                        ياقوت
+                    </button>
+                    <button class="whitespace-nowrap bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color">
+                        زمرد
+                    </button>
+                    <button class="whitespace-nowrap bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color">
+                        ياقوت أزرق
+                    </button>
+                    <button class="whitespace-nowrap bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color">
+                        عقيق
+                    </button>
+                    <button class="whitespace-nowrap bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color">
+                        توباز
+                    </button>
+                </div>
+                
+                <!-- زر الفلتر للجوال -->
+                <button id="mobile-filter-toggle" class="md:hidden flex items-center space-x-2 rtl:space-x-reverse bg-tertiary hover:bg-opacity-80 text-primary px-4 py-2 rounded-full text-sm transition border border-color ml-4">
+                    <i class="fas fa-filter"></i>
+                    <span>فلتر</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- الشريط الجانبي للتصفية -->
+            <div id="sidebar" class="sidebar-mobile md:relative md:w-1/4 lg:w-1/5 bg-secondary rounded-xl p-4 border border-color">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold gold-text">تصفية المنتجات</h2>
+                    <button id="close-sidebar" class="md:hidden text-secondary hover:text-primary">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- فئة الحجر -->
+                    <div>
+                        <h3 class="font-bold mb-2 text-primary">نوع الحجر</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">ألماس</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">ياقوت</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">زمرد</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">ياقوت أزرق</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">عقيق</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- النطاق السعري -->
+                    <div>
+                        <h3 class="font-bold mb-2 text-primary">النطاق السعري (ر.س)</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="price" class="text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">جميع الأسعار</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="price" class="text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">أقل من 5,000</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="price" class="text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">5,000 - 20,000</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="price" class="text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">20,000 - 50,000</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="price" class="text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">أكثر من 50,000</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- الجودة -->
+                    <div>
+                        <h3 class="font-bold mb-2 text-primary">مستوى الجودة</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">ممتاز</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">جيد جداً</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">جيد</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- التوفر -->
+                    <div>
+                        <h3 class="font-bold mb-2 text-primary">التوفر</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">متوفر</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">تحت الطلب</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- البائع -->
+                    <div>
+                        <h3 class="font-bold mb-2 text-primary">البائع</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">بائعون موثوقون فقط</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- أزرار التصفية -->
+                    <div class="flex space-x-2 rtl:space-x-reverse">
+                        <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg">
+                            تطبيق
+                        </button>
+                        <button class="flex-1 bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
+                            إعادة تعيين
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- طبقة التعتيم للجوال -->
+            <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+            <!-- قسم المنتجات -->
+            <div class="flex-1">
+                <!-- عناصر التحكم بالعرض -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                        <span class="text-secondary">عرض:</span>
+                        <button class="bg-secondary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                        <span class="text-secondary text-sm hidden md:block">ترتيب حسب:</span>
+                        <select class="bg-secondary text-primary rounded-lg py-2 px-3 border border-color focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                            <option>الأكثر مبيعاً</option>
+                            <option>الأحدث</option>
+                            <option>الأعلى سعراً</option>
+                            <option>الأقل سعراً</option>
+                            <option>الأعلى تقييماً</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- منتجات مميزة -->
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold mb-6 gold-text border-b border-color pb-2">المنتجات المميزة</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- منتج 1 -->
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover product-card border border-color">
+                            <div class="relative overflow-hidden">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="./imges/ياقوت وردي نقي من ميانمار2.jpeg" alt="ياقوت أزرق" class="w-full h-full object-cover product-image">
+                                </div>
+                                <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
+                                    الأكثر مبيعاً
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">ياقوت أزرق نادر من سريلانكا</h3>
+                                <p class="text-secondary text-sm mb-4">ياقوت أزرق طبيعي عالي الجودة، وزن 2.5 قيراط، نقاء استثنائي</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-yellow-500 font-bold text-xl">18,500 ر.س</span>
+                                    <div class="flex items-center">
+                                        <div class="flex text-yellow-500 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                        <span class="text-xs text-secondary mr-1">(24)</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
+                                        <i class="fas fa-shopping-cart ml-1"></i>
+                                        أضف للسلة
+                                    </button>
+                                    <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- منتج 2 -->
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover product-card border border-color">
+                            <div class="relative overflow-hidden">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="./imges/زمرد كولومبي نقي عالي الجودة.jpeg" alt="زمرد" class="w-full h-full object-cover product-image">
+                                </div>
+                                <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
+                                    جديد
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">زمرد كولومبي نقي عالي الجودة</h3>
+                                <p class="text-secondary text-sm mb-4">زمرد طبيعي من كولومبيا، وزن 3 قيراط، لون أخضر نقي</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-yellow-500 font-bold text-xl">22,750 ر.س</span>
+                                    <div class="flex items-center">
+                                        <div class="flex text-yellow-500 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="text-xs text-secondary mr-1">(18)</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
+                                        <i class="fas fa-shopping-cart ml-1"></i>
+                                        أضف للسلة
+                                    </button>
+                                    <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- منتج 3 -->
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover product-card border border-color">
+                            <div class="relative overflow-hidden">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="./imges/ألماس وردي نادر.jpeg" alt="ألماس" class="w-full h-full object-cover product-image">
+                                </div>
+                                <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
+                                    محدود
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="fas fa-heart text-red-500"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">ألماس وردي نادر من جنوب أفريقيا</h3>
+                                <p class="text-secondary text-sm mb-4">ألماس وردي طبيعي نادر، وزن 1.5 قيراط، جودة استثنائية</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-yellow-500 font-bold text-xl">125,000 ر.س</span>
+                                    <div class="flex items-center">
+                                        <div class="flex text-yellow-500 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <span class="text-xs text-secondary mr-1">(32)</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
+                                        <i class="fas fa-shopping-cart ml-1"></i>
+                                        أضف للسلة
+                                    </button>
+                                    <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- جميع المنتجات -->
+                <div>
+                    <h2 class="text-2xl font-bold mb-6 gold-text border-b border-color pb-2">جميع المنتجات</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- منتج 4 -->
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover product-card border border-color">
+                            <div class="relative overflow-hidden">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="./imges/ياقوت وردي من ميانمار.jpeg" alt="ياقوت وردي" class="w-full h-full object-cover product-image">
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">ياقوت وردي نقي من ميانمار</h3>
+                                <p class="text-secondary text-sm mb-4">ياقوت وردي طبيعي، وزن 2 قيراط، لون وردي نقي</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-yellow-500 font-bold text-xl">15,300 ر.س</span>
+                                    <div class="flex items-center">
+                                        <div class="flex text-yellow-500 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                        <span class="text-xs text-secondary mr-1">(14)</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
+                                        <i class="fas fa-shopping-cart ml-1"></i>
+                                        أضف للسلة
+                                    </button>
+                                    <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- منتج 5 -->
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover product-card border border-color">
+                            <div class="relative overflow-hidden">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="./imges/عقيق نادر من اليمن بلون فريد2.jpeg" alt="عقيق" class="w-full h-full object-cover product-image">
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">عقيق نادر من اليمن بلون فريد</h3>
+                                <p class="text-secondary text-sm mb-4">عقيق يمني طبيعي، وزن 5 قيراط، ألوان متعددة فريدة</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-yellow-500 font-bold text-xl">8,500 ر.س</span>
+                                    <div class="flex items-center">
+                                        <div class="flex text-yellow-500 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="text-xs text-secondary mr-1">(21)</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
+                                        <i class="fas fa-shopping-cart ml-1"></i>
+                                        أضف للسلة
+                                    </button>
+                                    <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- منتج 6 -->
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover product-card border border-color">
+                            <div class="relative overflow-hidden">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="./imges/توباز أزرق برازيلي شفاف.jpeg" alt="توباز" class="w-full h-full object-cover product-image">
+                                </div>
+                                <div class="absolute top-4 left-4 bg-blue-500 text-white text-xs font-bold py-1 px-2 rounded">
+                                    عروض
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">توباز أزرق برازيلي شفاف</h3>
+                                <p class="text-secondary text-sm mb-4">توباز أزرق طبيعي، وزن 4 قيراط، شفافية عالية</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <span class="text-yellow-500 font-bold text-xl">12,300 ر.س</span>
+                                        <span class="text-red-500 text-sm line-through mr-2">14,500 ر.س</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="flex text-yellow-500 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="text-xs text-secondary mr-1">(9)</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
+                                        <i class="fas fa-shopping-cart ml-1"></i>
+                                        أضف للسلة
+                                    </button>
+                                    <button class="bg-tertiary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ترقيم الصفحات -->
+                <div class="flex justify-center mt-12">
+                    <nav class="flex items-center space-x-2 rtl:space-x-reverse">
+                        <button class="bg-secondary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="bg-secondary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color font-bold">1</button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">2</button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">3</button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">4</button>
+                        <span class="text-secondary px-2">...</span>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">10</button>
+                        <button class="bg-secondary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- قسم البائعين المميزين -->
+    <section class="py-16 bg-tertiary mt-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center gold-text mb-12">البائعون المميزون</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- بائع 1 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="بائع" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-center">أحمد الجواهري</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- بائع 2 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="بائع" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-center">محمد الأحمدي</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- بائع 3 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="بائع" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-center">خالد البلوي</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- بائع 4 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="بائع" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-center">سعيد القحطاني</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- بائع 5 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="بائع" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-center">فهد الشمري</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- بائع 6 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="بائع" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-center">نورة السديري</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer class="bg-secondary py-12 border-t border-color">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center">
+                            <i class="fas fa-gem text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold mr-3 gold-text">جوهرة</h2>
+                    </div>
+                    <p class="text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة في العالم العربي.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4 gold-text">المتجر</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">جميع المنتجات</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">المنتجات الجديدة</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">العروض الخاصة</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">الأكثر مبيعاً</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4 gold-text">الدعم</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">الأسئلة الشائعة</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">اتصل بنا</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">الشكاوى والاقتراحات</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">مركز المساعدة</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4 gold-text">طرق الدفع</h3>
+                    <div class="flex space-x-2 rtl:space-x-reverse mb-4">
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fab fa-cc-visa text-2xl text-blue-500"></i>
+                        </div>
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fab fa-cc-mastercard text-2xl text-red-500"></i>
+                        </div>
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fab fa-cc-paypal text-2xl text-blue-400"></i>
+                        </div>
+                    </div>
+                    <p class="text-secondary text-sm">جميع المعاملات محمية ومشفرة</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-color mt-8 pt-8 text-center">
+                <p class="text-secondary gold-text">© 2023 جوهرة. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // التحكم في الوضع النهاري والليلي
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        // التحقق من تفضيلات النظام والمستخدم
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        function getUserPreference() {
+            return localStorage.getItem('theme');
+        }
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        
+        // تهيئة الوضع الأولي
+        function initTheme() {
+            const userPreference = getUserPreference();
+            if (userPreference) {
+                setTheme(userPreference);
+            } else {
+                const systemTheme = getSystemTheme();
+                setTheme(systemTheme);
+            }
+        }
+        
+        // تبديل الوضع
+        function toggleTheme() {
+            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // الاستماع لتغيرات نظام التشغيل
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!getUserPreference()) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+        
+        // التحكم في الشريط الجانبي للجوال
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+        const closeSidebar = document.getElementById('close-sidebar');
+        
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeSidebarFunc() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // إضافة المستمعين للأحداث
+        themeToggle.addEventListener('click', toggleTheme);
+        mobileFilterToggle.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarFunc);
+        sidebarOverlay.addEventListener('click', closeSidebarFunc);
+        
+        // تأثيرات الريبل للأزرار
+        const rippleButtons = document.querySelectorAll('.ripple');
+        rippleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // إضافة صوت نقرة معدنية
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+            });
+        });
+        
+        // تهيئة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+        });
+    </script>
+</body>
+</html>
