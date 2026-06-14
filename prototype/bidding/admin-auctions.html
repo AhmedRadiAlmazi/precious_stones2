@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المزادات | جوهرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <script src="js/theme.js"></script>
+    <script src="js/layout.js"></script>
+    <style>
+        /* Force correct responsive behavior */
+        @media (max-width: 1024px) {
+            .dashboard-main {
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .dashboard-sidebar {
+                transform: translateX(100%);
+            }
+            .dashboard-sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        /* Ensure table scrolling */
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+            max-width: 100vw;
+        }
+    </style>
+</head>
+<body class="theme-transition bg-primary text-primary dark-theme">
+    <script src="js/api.js"></script>
+    <script>
+        if (checkAuth()) {
+            const user = api.getUser();
+            const isAdmin = user && user.roles && user.roles.some(r => r.name === 'admin');
+            if (!isAdmin) {
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Dashboard Header -->
+
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Filters -->
+                <div class="bg-secondary border border-color rounded-xl p-4 mb-6">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="search-auctions" placeholder="البحث في المزادات..." 
+                            class="bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary w-full md:w-auto md:flex-1">
+                        
+                        <select id="filter-status" class="bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary w-full md:w-auto">
+                            <option value="">جميع الحالات</option>
+                            <option value="pending">في الانتظار</option>
+                            <option value="active">نشط</option>
+                            <option value="ended">منتهي</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+
+                        <button onclick="loadAuctions(1)" class="bg-gold text-black px-4 py-2 rounded-lg hover:shadow-lg transition w-full md:w-auto">
+                            <i class="fas fa-search ml-2"></i>
+                            بحث
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Auctions Grid -->
+                <div id="auctions-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="text-center py-12 text-secondary col-span-full">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                        <p>جاري تحميل المزادات...</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="flex justify-between items-center">
+                    <div class="text-sm text-secondary" id="pagination-info">
+                        عرض 0 من 0
+                    </div>
+                    <div class="flex gap-2" id="pagination-buttons">
+                        <!-- Pagination buttons will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="./js/api.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Check authentication
+        if (!checkAuth()) {
+            // Will redirect to login
+        }
+
+        const user = api.getUser();
+        const isAdmin = user.roles && user.roles.some(role => role.name === 'admin');
+        if (!isAdmin) {
+            alert('هذه الصفحة للمديرين فقط!');
+            setTimeout(() => window.location.href = '../index.html', 2000);
+        }
+
+        let currentPage = 1;
+        let totalPages = 1;
+
+        // Load auctions
+        async function loadAuctions(page = 1) {
+            try {
+                const params = { page };
+                
+                const searchValue = document.getElementById('search-auctions').value;
+                if (searchValue) params.search = searchValue;
+                
+                const statusValue = document.getElementById('filter-status').value;
+                if (statusValue) params.status = statusValue;
+
+                const response = await api.getAdminAuctions(params);
+                displayAuctions(response.data);
+            } catch (error) {
+                console.error('Error loading auctions:', error);
+                ui.showError('فشل تحميل المزادات');
+            }
+        }
+
+        function displayAuctions(data) {
+            const grid = document.getElementById('auctions-grid');
+            const auctions = data.data;
+            
+            if (auctions.length === 0) {
+                grid.innerHTML = `
+                    <div class="text-center py-12 text-secondary col-span-full">
+                        <i class="fas fa-gavel text-6xl mb-4"></i>
+                        <p class="text-xl">لا توجد مزادات</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = auctions.map(auction => {
+                const statusColors = {
+                    'pending': 'bg-yellow-500 bg-opacity-20 text-yellow-500',
+                    'active': 'bg-green-500 bg-opacity-20 text-green-500',
+                    'ended': 'bg-gray-500 bg-opacity-20 text-gray-500',
+                    'cancelled': 'bg-red-500 bg-opacity-20 text-red-500'
+                };
+
+                const statusText = {
+                    'pending': 'في الانتظار',
+                    'active': 'نشط',
+                    'ended': 'منتهي',
+                    'cancelled': 'ملغي'
+                };
+
+                return `
+                    <div class="bg-secondary border border-color rounded-xl p-6 hover:shadow-lg transition">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-primary mb-1">${auction.product ? auction.product.name : 'منتج محذوف'}</h3>
+                                <p class="text-sm text-secondary">البائع: ${auction.seller ? auction.seller.first_name + ' ' + auction.seller.last_name : 'غير محدد'}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusColors[auction.status]}">
+                                ${statusText[auction.status]}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-tertiary rounded-lg p-3">
+                                <p class="text-xs text-secondary mb-1">السعر الحالي</p>
+                                <p class="text-lg font-bold text-green-500">${auction.current_price} ر.س</p>
+                            </div>
+                            <div class="bg-tertiary rounded-lg p-3">
+                                <p class="text-xs text-secondary mb-1">عدد المزايدات</p>
+                                <p class="text-lg font-bold text-primary">${auction.bids_count || 0}</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 mb-4 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-secondary">البداية:</span>
+                                <span class="text-primary">${new Date(auction.start_time).toLocaleString('ar-SA')}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">النهاية:</span>
+                                <span class="text-primary">${new Date(auction.end_time).toLocaleString('ar-SA')}</span>
+                            </div>
+                            ${auction.winner ? `
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">الفائز:</span>
+                                    <span class="text-gold font-semibold">${auction.winner.first_name} ${auction.winner.last_name}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="flex gap-2 pt-4 border-t border-color">
+                            ${auction.status === 'pending' ? `
+                                <button onclick="approveAuction(${auction.id})" 
+                                    class="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition text-sm">
+                                    <i class="fas fa-check ml-1"></i>
+                                    موافقة
+                                </button>
+                                <button onclick="rejectAuction(${auction.id})" 
+                                    class="flex-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">
+                                    <i class="fas fa-times ml-1"></i>
+                                    رفض
+                                </button>
+                            ` : auction.status === 'active' ? `
+                                <button onclick="endAuction(${auction.id})" 
+                                    class="flex-1 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition text-sm">
+                                    <i class="fas fa-stop ml-1"></i>
+                                    إنهاء المزاد
+                                </button>
+                            ` : ''}
+                            ${auction.status === 'pending' || auction.status === 'cancelled' ? `
+                                <button onclick="deleteAuction(${auction.id})" 
+                                    class="px-4 py-2 rounded-lg bg-red-500 bg-opacity-20 hover:bg-opacity-30 transition text-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update pagination
+            currentPage = data.current_page;
+            totalPages = data.last_page;
+            updatePagination(data);
+        }
+
+        function updatePagination(data) {
+            document.getElementById('pagination-info').textContent = 
+                `عرض ${data.from || 0} - ${data.to || 0} من ${data.total}`;
+
+            const buttonsContainer = document.getElementById('pagination-buttons');
+            buttonsContainer.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'px-3 py-1 bg-tertiary rounded hover:bg-gold hover:text-black transition';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                prevBtn.onclick = () => loadAuctions(currentPage - 1);
+                buttonsContainer.appendChild(prevBtn);
+            }
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `px-3 py-1 rounded transition ${
+                        i === currentPage 
+                            ? 'bg-gold text-black font-bold' 
+                            : 'bg-tertiary hover:bg-gold hover:text-black'
+                    }`;
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => loadAuctions(i);
+                    buttonsContainer.appendChild(pageBtn);
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    const dots = document.createElement('span');
+                    dots.className = 'px-2 text-secondary';
+                    dots.textContent = '...';
+                    buttonsContainer.appendChild(dots);
+                }
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'px-3 py-1 bg-tertiary rounded hover:bg-gold hover:text-black transition';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                nextBtn.onclick = () => loadAuctions(currentPage + 1);
+                buttonsContainer.appendChild(nextBtn);
+            }
+        }
+
+        // Approve auction
+        async function approveAuction(id) {
+            if (!confirm('هل أنت متأكد من الموافقة على هذا المزاد؟')) return;
+
+            try {
+                await api.approveAuction(id);
+                ui.showSuccess('تمت الموافقة على المزاد بنجاح!');
+                loadAuctions(currentPage);
+            } catch (error) {
+                console.error('Error approving auction:', error);
+                ui.showError(error.message || 'فشل الموافقة على المزاد');
+            }
+        }
+
+        // Reject auction
+        async function rejectAuction(id) {
+            if (!confirm('هل أنت متأكد من رفض هذا المزاد؟')) return;
+
+            try {
+                await api.rejectAuction(id);
+                ui.showSuccess('تم رفض المزاد');
+                loadAuctions(currentPage);
+            } catch (error) {
+                console.error('Error rejecting auction:', error);
+                ui.showError(error.message || 'فشل رفض المزاد');
+            }
+        }
+
+        // End auction
+        async function endAuction(id) {
+            if (!confirm('هل أنت متأكد من إنهاء هذا المزاد؟\n\nسيتم إنهاء المزاد فوراً وتحديد الفائز.')) return;
+
+            try {
+                await api.endAuction(id);
+                ui.showSuccess('تم إنهاء المزاد بنجاح!');
+                loadAuctions(currentPage);
+            } catch (error) {
+                console.error('Error ending auction:', error);
+                ui.showError(error.message || 'فشل إنهاء المزاد');
+            }
+        }
+
+        // Delete auction
+        async function deleteAuction(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا المزاد؟')) return;
+
+            try {
+                await api.deleteAdminAuction(id);
+                ui.showSuccess('تم حذف المزاد بنجاح!');
+                loadAuctions(currentPage);
+            } catch (error) {
+                console.error('Error deleting auction:', error);
+                ui.showError(error.message || 'فشل حذف المزاد');
+            }
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Event listeners
+        document.getElementById('search-auctions').addEventListener('input', debounce(() => {
+            loadAuctions(1);
+        }, 500));
+
+        document.getElementById('filter-status').addEventListener('change', () => {
+            loadAuctions(1);
+        });
+
+        // Initial load
+        loadAuctions();
+    </script>
+</body>
+</html>

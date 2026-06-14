@@ -1,12 +1,72 @@
-:root{
-  --bg:#0f0f10;
-  --charcoal:#0b0b0c;
-  --gold:#caa34a;
-  --gold-soft:#d6b75a;
-  --muted:#9a9a9a;
+:root {
+  /* Common Variables */
+  --gold: #caa34a;
+  --gold-soft: #d6b75a;
+  
+  /* Light Mode Defaults */
+  --bg: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;  /* Added for compatibility */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a5568;
+  --border-color: rgba(0,0,0,0.1);
+  --card-bg: #ffffff;
+  --header-border: rgba(0,0,0,0.05);
+  --input-bg: rgba(0,0,0,0.03);
 }
-*{box-sizing:border-box}
-html, body{height:100%;margin:0;font-family:'Cairo', 'IBM Plex Sans Arabic', sans-serif;background:linear-gradient(180deg,var(--bg),#0a0a0b);color:#fff}
+
+:root.dark {
+  /* Dark Mode Overrides */
+  --bg: #0f0f10;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2d2d2d; /* Added for compatibility */
+  --text-primary: #ffffff;
+  --text-secondary: #9a9a9a;
+  --border-color: rgba(255,255,255,0.1);
+  --card-bg: #111111;
+  --header-border: rgba(255,255,255,0.03);
+  --input-bg: rgba(255,255,255,0.05);
+
+  /* Gold adjustments for dark mode readability */
+  --gold: #D4AF37; 
+  --gold-soft: #C5A028;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* API-compatible utility classes */
+.bg-primary {
+    background-color: var(--bg);
+}
+
+.bg-secondary {
+    background-color: var(--bg-secondary);
+}
+
+.bg-tertiary {
+    background-color: var(--bg-tertiary);
+}
+
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.border-color {
+    border-color: var(--border-color);
+}
 .header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.03)}
 .logo{font-weight:700;color:var(--gold);font-size:clamp(16px,1.8vw,22px);letter-spacing:1px}
 .logo span{color:#fff;font-weight:400;margin-right:6px}

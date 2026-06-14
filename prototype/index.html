@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="bidding/styles.css">
     <link rel="stylesheet" href="bidding/responsive.css">
+    <script src="bidding/js/api.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -174,32 +175,7 @@
             transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
         }
         
-        /* تأثيرات خاصة للوضع النهاري */
-        .light-theme {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-        }
-        
-        /* تأثيرات خاصة للوضع الليلي */
-        .dark-theme {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #475569;
-        }
-        
-        .bg-primary { background-color: var(--bg-primary); }
-        .bg-secondary { background-color: var(--bg-secondary); }
-        .bg-tertiary { background-color: var(--bg-tertiary); }
-        .text-primary { color: var(--text-primary); }
-        .text-secondary { color: var(--text-secondary); }
-        .border-color { border-color: var(--border-color); }
+         /* theme vars removed - using styles.css */
 
         /* تأثيرات إضافية للتنقل السلس */
         html {
@@ -267,10 +243,12 @@
             <div class="flex justify-between items-center">
                 <!-- الشعار -->
                 <div class="flex items-center">
-                    <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
-                        <i class="fas fa-gem text-white text-xl"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                    <a href="index.html" class="flex items-center" aria-label="العودة إلى الصفحة الرئيسية">
+                        <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
+                            <i class="fas fa-gem text-white text-xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                    </a>
                 </div>
                 
                 <!-- شريط البحث -->
@@ -285,8 +263,9 @@
                 
                 <!-- القائمة -->
                 <nav class="hidden md:flex space-x-6 rtl:space-x-reverse">
-                    <a href="./bidding/auction.html" class="hover:text-yellow-500 transition">المزادات</a>
-                    <a href="./bidding/theshop.html" class="hover:text-yellow-500 transition">المتجر</a>
+                    <a href="../index.html" class="hover:text-yellow-500 transition">الرئيسية</a>
+                    <a href="bidding/auction.html" class="hover:text-yellow-500 transition">المزادات</a>
+                    <a href="bidding/theshop.html" class="hover:text-yellow-500 transition">المتجر</a>
                     <a href="#" class="hover:text-yellow-500 transition">البائعون</a>
                     <a href="#" class="hover:text-yellow-500 transition">الدعم</a>
                 </nav>
@@ -296,11 +275,16 @@
                     <i class="fas fa-bars text-secondary"></i>
                 </button>
 
+                <!-- أزرار التسجيل/الدخول -->
+                <div id="auth-buttons-container" class="hidden md:flex items-center ml-4">
+                    <!-- سيتم تعبئة هذا القسم بواسطة JavaScript -->
+                </div>
+
                 <!-- الأيقونات -->
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <!-- زر تبديل الوضع -->
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-tertiary transition">
-                        <i id="theme-icon" class="fas fa-moon text-secondary"></i>
+                    <button id="theme-toggle" class="theme-toggle p-2 rounded-full hover:bg-tertiary transition">
+                        <i id="theme-icon" class="theme-toggle-icon fas fa-moon text-secondary"></i>
                     </button>
                     
                     <button class="relative p-2 rounded-full hover:bg-tertiary transition">
@@ -324,8 +308,8 @@
             <div id="mobile-menu" class="md:hidden bg-secondary border-t border-color hidden">
                 <div class="container mx-auto px-4 py-4">
                     <nav class="flex flex-col space-y-4">
-                        <a href="#" class="hover:text-yellow-500 transition">المزادات</a>
-                        <a href="#" class="hover:text-yellow-500 transition">المتجر</a>
+                        <a href="bidding/auction.html" class="hover:text-yellow-500 transition">المزادات</a>
+                        <a href="bidding/theshop.html" class="hover:text-yellow-500 transition">المتجر</a>
                         <a href="#" class="hover:text-yellow-500 transition">البائعون</a>
                         <a href="#" class="hover:text-yellow-500 transition">الدعم</a>
                     </nav>
@@ -369,121 +353,10 @@
                 </a>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- بطاقة منتج 1 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
-                    <div class="certification-seal">
-                        <i class="fas fa-award text-white"></i>
-                    </div>
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/ياقوت أزرق نادر.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
-                            موثق
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">ياقوت أزرق نادر</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">18,500 ر.س</span>
-                            <span class="text-secondary text-sm">سريلانكا</span>
-                        </div>
-                        <div class="flex items-center mb-4">
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 95%"></div>
-                            </div>
-                            <span class="text-xs text-secondary mr-2">95%</span>
-                        </div>
-                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
-                            عرض التفاصيل
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- بطاقة منتج 2 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
-                    <div class="certification-seal">
-                        <i class="fas fa-award text-white"></i>
-                    </div>
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/زمرد كولومبي نقي.jpg" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
-                            موثق
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">زمرد كولومبي نقي</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">22,750 ر.س</span>
-                            <span class="text-secondary text-sm">كولومبيا</span>
-                        </div>
-                        <div class="flex items-center mb-4">
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 92%"></div>
-                            </div>
-                            <span class="text-xs text-secondary mr-2">92%</span>
-                        </div>
-                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
-                            عرض التفاصيل
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- بطاقة منتج 3 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
-                    <div class="certification-seal">
-                        <i class="fas fa-award text-white"></i>
-                    </div>
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/ألماس وردي نادر.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
-                            موثق
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">ألماس وردي نادر</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">125,000 ر.س</span>
-                            <span class="text-secondary text-sm">جنوب أفريقيا</span>
-                        </div>
-                        <div class="flex items-center mb-4">
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 98%"></div>
-                            </div>
-                            <span class="text-xs text-secondary mr-2">98%</span>
-                        </div>
-                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
-                            عرض التفاصيل
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- بطاقة منتج 4 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
-                    <div class="certification-seal">
-                        <i class="fas fa-award text-white"></i>
-                    </div>
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/ياقوت وردي من ميانمار.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
-                            موثق
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">ياقوت وردي من ميانمار</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">15,300 ر.س</span>
-                            <span class="text-secondary text-sm">ميانمار</span>
-                        </div>
-                        <div class="flex items-center mb-4">
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 90%"></div>
-                            </div>
-                            <span class="text-xs text-secondary mr-2">90%</span>
-                        </div>
-                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
-                            عرض التفاصيل
-                        </button>
-                    </div>
+            <div id="featured-products-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- سيتم تحميل المنتجات هنا -->
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-yellow-500"></i>
                 </div>
             </div>
         </div>
@@ -500,101 +373,10 @@
                 </a>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- مزاد 1 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover pulse-glow border border-color">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/عقيق نادر من اليمن.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
-                            ينتهي قريبًا
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">عقيق نادر من اليمن</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">8,500 ر.س</span>
-                            <span class="text-secondary text-sm">اليمن</span>
-                        </div>
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>الوقت المتبقي</span>
-                                <span class="countdown-flash">05:12:34</span>
-                            </div>
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-red-500 h-2 rounded-full" style="width: 15%"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-secondary">12 مزايد</span>
-                            <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple">
-                                زايد الآن
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- مزاد 2 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/توباز أزرق برازيلي.png" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
-                            نشط
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">توباز أزرق برازيلي</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">12,300 ر.س</span>
-                            <span class="text-secondary text-sm">البرازيل</span>
-                        </div>
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>الوقت المتبقي</span>
-                                <span>2 يوم 04:22:15</span>
-                            </div>
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-secondary">7 مزايدين</span>
-                            <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple">
-                                زايد الآن
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- مزاد 3 -->
-                <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="./bidding/imges/عقيق ناري استرالي.jpg" alt="حجر كريم" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
-                            نشط
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold mb-2">عقيق ناري استرالي</h3>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-yellow-500 font-bold">9,800 ر.س</span>
-                            <span class="text-secondary text-sm">أستراليا</span>
-                        </div>
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>الوقت المتبقي</span>
-                                <span>1 يوم 12:45:22</span>
-                            </div>
-                            <div class="w-full bg-tertiary rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 40%"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-secondary">9 مزايدين</span>
-                            <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple">
-                                زايد الآن
-                            </button>
-                        </div>
-                    </div>
+            <div id="live-auctions-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- سيتم تحميل المزادات هنا -->
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-yellow-500"></i>
                 </div>
             </div>
         </div>
@@ -711,9 +493,11 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center mb-4">
-                        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center">
-                            <i class="fas fa-gem text-white"></i>
-                        </div>
+                        <a href="index.html" aria-label="العودة إلى الصفحة الرئيسية">
+                            <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center">
+                                <i class="fas fa-gem text-white"></i>
+                            </div>
+                        </a>
                         <h2 class="text-xl font-bold mr-3 gold-text">جوهرة</h2>
                     </div>
                     <p class="text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة في العالم العربي.</p>
@@ -765,64 +549,16 @@
         </div>
     </footer>
 
+    <script src="bidding/js/theme.js"></script>
     <script>
-        // التحكم في الوضع النهاري والليلي
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const body = document.body;
-        
-        // التحقق من تفضيلات النظام والمستخدم
-        function getSystemTheme() {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        
-        function getUserPreference() {
-            return localStorage.getItem('theme');
-        }
-        
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                body.classList.add('dark-theme');
-                body.classList.remove('light-theme');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                body.classList.add('light-theme');
-                body.classList.remove('dark-theme');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        }
-        
-        // تهيئة الوضع الأولي
-        function initTheme() {
-            const userPreference = getUserPreference();
-            if (userPreference) {
-                setTheme(userPreference);
-            } else {
-                const systemTheme = getSystemTheme();
-                setTheme(systemTheme);
-            }
-        }
-        
-        // تبديل الوضع
-        function toggleTheme() {
-            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            setTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-        
-        // الاستماع لتغيرات نظام التشغيل
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!getUserPreference()) {
-                setTheme(e.matches ? 'dark' : 'light');
-            }
+        // --- Backend Connection Logic ---
+        document.addEventListener('DOMContentLoaded', async () => {
+             // ... existing backend logic ...
+
         });
         
         // إضافة المستمعين للأحداث
-        themeToggle.addEventListener('click', toggleTheme);
+
 
         // تبديل القائمة المحمولة
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
@@ -915,37 +651,21 @@
         
         // تهيئة تأثير الجسيمات عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
-            initTheme();
             createParticles();
             
-            // تأثيرات الريبل للأزرار
+            
+            // Ripple effect logic kept
             const rippleButtons = document.querySelectorAll('.ripple');
             rippleButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
-                    // إضافة صوت نقرة معدنية
                     const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
                     audio.volume = 0.3;
                     audio.play().catch(() => {});
                 });
             });
             
-            // عدادات تنازلية للمزادات
-            function updateCountdowns() {
-                const countdownElements = document.querySelectorAll('.countdown-flash');
-                countdownElements.forEach(element => {
-                    // في التطبيق الحقيقي، سيكون هناك حساب الوقت المتبقي الحقيقي
-                    // هنا نستخدم قيمة عشوائية للعرض فقط
-                    const hours = Math.floor(Math.random() * 6);
-                    const minutes = Math.floor(Math.random() * 60);
-                    const seconds = Math.floor(Math.random() * 60);
-                    
-                    element.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                });
-            }
-            
-            // تحديث العدادات كل ثانية
-            setInterval(updateCountdowns, 1000);
-            updateCountdowns();
+            // Random countdown logic REMOVED to allow backend data to display
+            // ...
 
             // زر العودة لأعلى
             const backToTopButton = document.createElement('button');
@@ -967,6 +687,287 @@
             backToTopButton.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
+        });
+    </script>
+    <script>
+        // --- Backend Connection Logic ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Global timer variable to prevent overlaps
+            let countdownInterval;
+
+            // Helper: Parse Date strictly as UTC
+            // Expects "YYYY-MM-DD HH:MM:SS"
+            function parseDateUTC(dateString) {
+                if (!dateString) return 0;
+                // Handle "2025-12-30 15:00:00"
+                const parts = dateString.split(/[- :]/);
+                if (parts.length >= 6) {
+                    return Date.UTC(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5]);
+                }
+                // Fallback for other formats
+                return new Date(dateString).getTime();
+            }
+
+            // Helper: Format time remaining
+            function formatTimeRemaining(endTimeStr) {
+                const end = parseDateUTC(endTimeStr);
+                const now = new Date().getTime(); // Current time in UTC (timestamp is always UTC)
+                
+                // Adjust for timezone offset if backend sends UTC but we want local time? 
+                // Actually timestamp comparison is best. Date.UTC vs Date.now().
+                
+                const total = end - now;
+
+                if (total <= 0) return 'منتهي';
+                
+                const seconds = Math.floor((total / 1000) % 60);
+                const minutes = Math.floor((total / 1000 / 60) % 60);
+                const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+                const days = Math.floor(total / (1000 * 60 * 60 * 24));
+                
+                const s = seconds < 10 ? '0' + seconds : seconds;
+                const m = minutes < 10 ? '0' + minutes : minutes;
+                const h = hours < 10 ? '0' + hours : hours;
+
+                if (days > 0) {
+                    return `${days} يوم ${h}:${m}:${s}`;
+                }
+                return `${h}:${m}:${s}`;
+            }
+
+            // Helper: Start Countdown Timer
+            function startCountdownTimers() {
+                // Clear existing timer if any
+                if (countdownInterval) clearInterval(countdownInterval);
+                
+                const timers = document.querySelectorAll('.countdown-flash');
+                
+                // Initial run immediately
+                updateTimers(timers);
+
+                countdownInterval = setInterval(() => {
+                    updateTimers(timers);
+                }, 1000);
+            }
+
+            function getImageUrl(img) {
+                if (!img) return null;
+                if (img.startsWith('http')) return img;
+                if (img.startsWith('/')) {
+                    // API_BASE_URL is defined in api.js as http://localhost:8800/api/v1
+                    // We need http://localhost:8800
+                    const baseUrl = 'http://localhost:8800'; 
+                    return `${baseUrl}${img}`;
+                }
+                return img;
+            }
+
+            function updateTimers(timers) {
+                timers.forEach(timer => {
+                    const endTime = timer.dataset.endTime;
+                    if (endTime) {
+                        const text = formatTimeRemaining(endTime);
+                        timer.innerText = text;
+                        
+                        // Visual update for expired items
+                        if (text === 'منتهي') {
+                            timer.classList.remove('text-yellow-500', 'text-white');
+                            timer.classList.add('text-red-500', 'font-bold');
+                            // Optionally disable the button
+                            const card = timer.closest('.card-hover');
+                            if(card) {
+                                const btn = card.querySelector('button');
+                                if(btn && !btn.disabled) {
+                                    btn.disabled = true;
+                                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                                    btn.innerText = 'انتهى المزاد';
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 1. Handle Authentication State
+            const authButtonsContainer = document.getElementById('auth-buttons-container');
+            if (api.isAuthenticated()) {
+                const user = api.getUser();
+                let dashboardLink = 'index.html'; // Default if no role matches
+                
+                if (user && user.roles && user.roles.some(r => r.name === 'admin')) {
+                    dashboardLink = 'bidding/admin-dashboard.html';
+                } else if (user && user.account_type === 'seller') {
+                    dashboardLink = 'bidding/seller-dashboard.html';
+                }
+
+                authButtonsContainer.innerHTML = `
+                    <a href="${dashboardLink}" class="bg-yellow-500 text-white hover:bg-yellow-600 font-bold py-2 px-6 rounded-full transition ml-2">
+                        <i class="fas fa-tachometer-alt ml-2"></i> لوحة التحكم
+                    </a>
+                `;
+                
+                // Also update the User icon in header to link to profile or dashboard
+                const userIconBtn = document.querySelector('.fa-user').parentElement;
+                if(userIconBtn) {
+                   userIconBtn.onclick = () => window.location.href = dashboardLink;
+                }
+                
+            } else {
+                authButtonsContainer.innerHTML = `
+                    <a href="bidding/login.html" class="text-secondary hover:text-yellow-500 font-semiblod ml-4 transition">
+                        تسجيل الدخول
+                    </a>
+                    <a href="bidding/register.html" class="bg-yellow-500 text-white hover:bg-yellow-600 font-bold py-2 px-6 rounded-full transition">
+                        حساب جديد
+                    </a>
+                `;
+            }
+
+            // 2. Fetch Featured Products
+            try {
+                const productsResponse = await api.getProducts({ page: 1, limit: 4 }); 
+                const products = productsResponse.data?.data || productsResponse.data || []; 
+                
+                const productsContainer = document.getElementById('featured-products-container');
+                
+                if (products.length > 0) {
+                    productsContainer.innerHTML = products.map(product => {
+                        const img = product.images && product.images.length > 0 ? getImageUrl(product.images[0]) : './bidding/imges/ياقوت أزرق نادر.jpeg';
+                        return `
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
+                            <div class="certification-seal">
+                                <i class="fas fa-award text-white"></i>
+                            </div>
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="${img}" 
+                                     alt="${product.name}" class="w-full h-full object-cover">
+                                <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
+                                    موثق
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2">${product.name}</h3>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-yellow-500 font-bold">${product.price} ر.س</span>
+                                    <span class="text-secondary text-sm">${product.country || 'غير محدد'}</span>
+                                </div>
+                                <div class="flex items-center mb-4">
+                                    <div class="w-full bg-tertiary rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 95%"></div>
+                                    </div>
+                                    <span class="text-xs text-secondary mr-2">95%</span>
+                                </div>
+                                <button onclick="window.location.href='bidding/theshop.html?id=${product.id}'" 
+                                    class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
+                                    عرض التفاصيل
+                                </button>
+                            </div>
+                        </div>
+                    `}).join('');
+                } else {
+                    productsContainer.innerHTML = '<p class="text-center col-span-full">لا توجد منتجات مميزة حالياً</p>';
+                }
+
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                 document.getElementById('featured-products-container').innerHTML = `
+                    <p class="text-center text-red-500 col-span-full">حدث خطأ أثناء تحميل المنتجات. يرجى المحاولة لاحقاً.</p>
+                `;
+            }
+
+            // 3. Fetch Active Auctions
+            try {
+                // Fetch more to ensure we have enough active ones to show, potentially filtering on client side
+                const auctionsResponse = await api.getAuctions({ limit: 10 });
+                let auctions = auctionsResponse.data?.data || auctionsResponse.data || [];
+
+                const auctionsContainer = document.getElementById('live-auctions-container');
+
+                if (auctions.length > 0) {
+                    // Process and Sort Auctions
+                    const now = new Date().getTime(); // UTC timestamp
+                    const processedAuctions = auctions.map(auction => {
+                        let endTimeStr = auction.end_time;
+                        // normalize string
+                        const endTime = parseDateUTC(endTimeStr);
+                        return {
+                            ...auction,
+                            _endTimeParsed: endTime,
+                            _isExpired: endTime <= now
+                        };
+                    });
+
+                    // Sort: Active first (closest ending), then Expired (recently ended)
+                    processedAuctions.sort((a, b) => {
+                        if (a._isExpired === b._isExpired) {
+                            return a._isExpired ? b._endTimeParsed - a._endTimeParsed : a._endTimeParsed - b._endTimeParsed;
+                        }
+                        return a._isExpired ? 1 : -1;
+                    });
+
+                    // Take top 3 after sorting
+                    const displayAuctions = processedAuctions.slice(0, 3);
+
+                    auctionsContainer.innerHTML = displayAuctions.map(auction => {
+                        const isExpired = auction._isExpired;
+                        const statusColor = isExpired ? 'bg-gray-500' : 'bg-green-500';
+                        const statusText = isExpired ? 'منتهي' : 'نشط';
+                        const btnState = isExpired ? 'disabled class="bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed"' : 'class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple" onclick="window.location.href=\'bidding/auction-details.html?id=' + auction.id + '\'"';
+                        const btnText = isExpired ? 'انتهى المزاد' : 'زايد الآن';
+                        const countdownDisplay = isExpired ? '<span class="text-red-500 font-bold">منتهي</span>' : `<span class="countdown-flash dir-ltr" data-end-time="${auction.end_time}">${formatTimeRemaining(auction.end_time)}</span>`;
+
+                        const imgUrl = auction.product && auction.product.images && auction.product.images.length > 0 
+                                     ? getImageUrl(auction.product.images[0]) 
+                                     : './bidding/imges/عقيق نادر من اليمن.jpeg';
+
+                        // Use styles.css variable-backed classes: bg-secondary for card background
+                        return `
+                         <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color shadow-lg transition-colors duration-300">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="${imgUrl}" 
+                                     alt="${auction.product?.name}" class="w-full h-full object-cover">
+                                <div class="absolute top-4 left-4 ${statusColor} text-white text-xs font-bold py-1 px-2 rounded">
+                                    ${statusText}
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary">${auction.product?.name || 'مزاد'}</h3>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-yellow-500 font-bold">${auction.current_bid || auction.starting_price} ر.س</span>
+                                    <span class="text-secondary text-sm">${auction.product?.country || 'غير محدد'}</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="flex justify-between text-sm mb-1 text-secondary">
+                                        <span>الوقت المتبقي</span>
+                                        ${countdownDisplay}
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div class="${isExpired ? 'bg-gray-500' : 'bg-green-500'} h-2 rounded-full" style="width: ${isExpired ? '100%' : '50%'}"></div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-secondary">${auction.bids_count || 0} مزايد</span>
+                                    <button ${btnState}>
+                                        ${btnText}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `}).join('');
+                    
+                    // Start timers
+                    startCountdownTimers();
+                    
+                } else {
+                    auctionsContainer.innerHTML = '<p class="text-center col-span-full text-secondary">لا توجد مزادات نشطة حالياً</p>';
+                }
+
+            } catch (error) {
+                console.error("Error fetching auctions:", error);
+                 document.getElementById('live-auctions-container').innerHTML = `
+                    <p class="text-center text-red-500 col-span-full">حدث خطأ أثناء تحميل المزادات. يرجى المحاولة لاحقاً.</p>
+                `;
+            }
         });
     </script>
 </body>

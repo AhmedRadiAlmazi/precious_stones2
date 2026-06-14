@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب | جوهرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="responsive.css">
+    <script src="js/theme.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            // ...
+    </script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            /* other vars handled by styles.css but keeping specific ones if needed */
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* Removed .light-theme and .dark-theme blocks to rely on styles.css */
+        
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-secondary { background-color: var(--bg-secondary); }
+        .bg-tertiary { background-color: var(--bg-tertiary); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .border-color { border-color: var(--border-color); }
+        
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        
+        .input-focus:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine-effect:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .shine-effect:hover:before {
+            left: 100%;
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="theme-transition bg-primary text-primary">
+    <!-- الهيدر المبسط -->
+    <header class="bg-secondary sticky top-0 z-50 shadow-lg border-b border-color">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- الشعار -->
+                <div class="flex items-center">
+                    <a href="../index.html" class="flex items-center" aria-label="العودة إلى الصفحة الرئيسية">
+                        <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
+                            <i class="fas fa-gem text-white text-xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                    </a>
+                </div>
+                
+                <!-- زر تبديل الوضع -->
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-tertiary transition">
+                    <i id="theme-icon" class="fas fa-moon text-secondary"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="min-h-screen flex items-center justify-center py-12 px-4 relative">
+        <!-- خلفية بجسيمات -->
+        <div class="particles-container" id="particles-container"></div>
+        
+        <div class="relative z-10 w-full max-w-2xl">
+            <!-- البطاقة -->
+            <div class="bg-secondary rounded-2xl shadow-2xl overflow-hidden border border-color">
+                <!-- الرأس -->
+                <div class="gold-gradient p-8 text-center">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 pulse-glow">
+                        <i class="fas fa-user-plus text-yellow-600 text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">انضم إلى جوهرة</h2>
+                    <p class="text-white text-opacity-90">أنشئ حسابك وابدأ رحلتك في عالم الأحجار الكريمة</p>
+                </div>
+                
+                <!-- النموذج -->
+                <div class="p-8">
+                    <form id="register-form" class="space-y-6">
+                        <!-- الصف الأول: الاسم الأول والأخير -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="first-name" class="block text-sm font-bold mb-2 text-primary">
+                                    <i class="fas fa-user ml-2 gold-text"></i>
+                                    الاسم الأول
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="first-name" 
+                                    name="first-name"
+                                    required
+                                    class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                    placeholder="أحمد"
+                                >
+                            </div>
+                            
+                            <div>
+                                <label for="last-name" class="block text-sm font-bold mb-2 text-primary">
+                                    <i class="fas fa-user ml-2 gold-text"></i>
+                                    الاسم الأخير
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="last-name" 
+                                    name="last-name"
+                                    required
+                                    class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                    placeholder="محمد"
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- البريد الإلكتروني -->
+                        <div>
+                            <label for="email" class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-envelope ml-2 gold-text"></i>
+                                البريد الإلكتروني
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email"
+                                required
+                                class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                placeholder="example@email.com"
+                            >
+                        </div>
+                        
+                        <!-- رقم الجوال -->
+                        <div>
+                            <label for="phone" class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-phone ml-2 gold-text"></i>
+                                رقم الجوال
+                            </label>
+                            <div class="flex gap-2">
+                                <select class="bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color">
+                                    <option value="+966">🇸🇦 +966</option>
+                                    <option value="+971">🇦🇪 +971</option>
+                                    <option value="+965">🇰🇼 +965</option>
+                                    <option value="+973">🇧🇭 +973</option>
+                                    <option value="+974">🇶🇦 +974</option>
+                                </select>
+                                <input 
+                                    type="tel" 
+                                    id="phone" 
+                                    name="phone"
+                                    required
+                                    class="flex-1 bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                    placeholder="5xxxxxxxx"
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- كلمة المرور -->
+                        <div>
+                            <label for="password" class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-lock ml-2 gold-text"></i>
+                                كلمة المرور
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password"
+                                    required
+                                    class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                    placeholder="••••••••"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="toggle-password"
+                                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-yellow-500"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <!-- مؤشر قوة كلمة المرور -->
+                            <div class="mt-2">
+                                <div class="password-strength bg-tertiary" id="password-strength"></div>
+                                <p class="text-xs text-secondary mt-1" id="password-strength-text">قوة كلمة المرور</p>
+                            </div>
+                        </div>
+                        
+                        <!-- تأكيد كلمة المرور -->
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-lock ml-2 gold-text"></i>
+                                تأكيد كلمة المرور
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="confirm-password" 
+                                    name="confirm-password"
+                                    required
+                                    class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                    placeholder="••••••••"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="toggle-confirm-password"
+                                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-yellow-500"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- نوع الحساب -->
+                        <div>
+                            <label class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-user-tag ml-2 gold-text"></i>
+                                نوع الحساب
+                            </label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="flex items-center p-4 bg-tertiary rounded-lg border border-color cursor-pointer hover:border-yellow-500 transition">
+                                    <input type="radio" name="account-type" value="buyer" checked class="text-yellow-500 focus:ring-yellow-500">
+                                    <div class="mr-3">
+                                        <p class="font-bold text-primary">مشتري</p>
+                                        <p class="text-xs text-secondary">للمزايدة والشراء</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-4 bg-tertiary rounded-lg border border-color cursor-pointer hover:border-yellow-500 transition">
+                                    <input type="radio" name="account-type" value="seller" class="text-yellow-500 focus:ring-yellow-500">
+                                    <div class="mr-3">
+                                        <p class="font-bold text-primary">بائع</p>
+                                        <p class="text-xs text-secondary">لعرض وبيع المنتجات</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- الموافقة على الشروط -->
+                        <div class="flex items-start">
+                            <input type="checkbox" id="terms" required class="rounded text-yellow-500 focus:ring-yellow-500 mt-1">
+                            <label for="terms" class="mr-2 text-sm text-secondary">
+                                أوافق على 
+                                <a href="#" class="text-yellow-500 hover:text-yellow-400">الشروط والأحكام</a>
+                                و
+                                <a href="#" class="text-yellow-500 hover:text-yellow-400">سياسة الخصوصية</a>
+                            </label>
+                        </div>
+                        
+                        <!-- زر إنشاء الحساب -->
+                        <button 
+                            type="submit"
+                            class="w-full gold-gradient text-white font-bold py-3 px-6 rounded-lg shine-effect hover:shadow-lg transition"
+                        >
+                            <i class="fas fa-user-plus ml-2"></i>
+                            إنشاء حساب
+                        </button>
+                    </form>
+                    
+                    <!-- الفاصل -->
+                    <div class="relative my-8">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-color"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-secondary text-secondary">أو سجل باستخدام</span>
+                        </div>
+                    </div>
+                    
+                    <!-- تسجيل بوسائل التواصل -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary py-3 rounded-lg transition border border-color">
+                            <i class="fab fa-google text-red-500 text-xl"></i>
+                        </button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary py-3 rounded-lg transition border border-color">
+                            <i class="fab fa-facebook text-blue-600 text-xl"></i>
+                        </button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary py-3 rounded-lg transition border border-color">
+                            <i class="fab fa-apple text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- رابط تسجيل الدخول -->
+                    <div class="mt-8 text-center">
+                        <p class="text-secondary">
+                            لديك حساب بالفعل؟
+                            <a href="./login.html" class="text-yellow-500 hover:text-yellow-400 font-bold transition">
+                                تسجيل الدخول
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- رابط العودة -->
+            <div class="mt-6 text-center">
+                <a href="../index.html" class="text-secondary hover:text-yellow-500 transition inline-flex items-center">
+                    <i class="fas fa-arrow-right ml-2"></i>
+                    العودة إلى الصفحة الرئيسية
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // التحكم في الوضع النهاري والليلي
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        function getUserPreference() {
+            return localStorage.getItem('theme');
+        }
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        
+        function initTheme() {
+            const userPreference = getUserPreference();
+            if (userPreference) {
+                setTheme(userPreference);
+            } else {
+                const systemTheme = getSystemTheme();
+                setTheme(systemTheme);
+            }
+        }
+        
+        function toggleTheme() {
+            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        // إظهار/إخفاء كلمة المرور
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+        
+        const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+        
+        // مؤشر قوة كلمة المرور
+        const passwordStrength = document.getElementById('password-strength');
+        const passwordStrengthText = document.getElementById('password-strength-text');
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]+/)) strength++;
+            if (password.match(/[A-Z]+/)) strength++;
+            if (password.match(/[0-9]+/)) strength++;
+            if (password.match(/[$@#&!]+/)) strength++;
+            
+            let width = (strength / 5) * 100;
+            let color = '';
+            let text = '';
+            
+            if (strength <= 2) {
+                color = '#ef4444';
+                text = 'ضعيفة';
+            } else if (strength <= 3) {
+                color = '#f59e0b';
+                text = 'متوسطة';
+            } else if (strength <= 4) {
+                color = '#10b981';
+                text = 'جيدة';
+            } else {
+                color = '#22c55e';
+                text = 'قوية جداً';
+            }
+            
+            passwordStrength.style.width = width + '%';
+            passwordStrength.style.backgroundColor = color;
+            passwordStrengthText.textContent = 'قوة كلمة المرور: ' + text;
+            passwordStrengthText.style.color = color;
+        });
+        
+        // معالجة النموذج
+        const registerForm = document.getElementById('register-form');
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (password !== confirmPassword) {
+                ui.showError('كلمة المرور وتأكيد كلمة المرور غير متطابقتين!');
+                return;
+            }
+            
+            const formData = {
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                phone: document.querySelector('select').value + document.getElementById('phone').value,
+                password: password,
+                password_confirmation: confirmPassword,
+                account_type: document.querySelector('input[name="account-type"]:checked').value
+            };
+            
+            try {
+                // Show loading
+                ui.showLoading(submitButton);
+                
+                // Call API
+                const response = await api.register(formData);
+                
+                // Show success message
+                ui.showSuccess(response.message || 'تم إنشاء الحساب بنجاح!');
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    const user = api.getUser();
+                    const userRoles = user.roles || [];
+                    const isAdmin = userRoles.some(role => role.name === 'admin');
+                    const isSeller = user.account_type === 'seller';
+                    
+                    if (isAdmin) {
+                        window.location.href = './admin-dashboard.html';
+                    } else if (isSeller) {
+                        window.location.href = './seller-dashboard.html';
+                    } else {
+                        window.location.href = '../index.html';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                ui.hideLoading(submitButton);
+                
+                if (error.errors) {
+                    ui.showValidationErrors(error.errors, registerForm);
+                } else {
+                    ui.showError(error.message || 'فشل إنشاء الحساب. يرجى المحاولة مرة أخرى.');
+                }
+            }
+        });
+        
+        // تأثير الجسيمات الذهبية
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                const duration = Math.random() * 20 + 10;
+                particle.style.animation = `float ${duration}s linear infinite`;
+                
+                const keyframes = `
+                @keyframes float {
+                    0% {
+                        transform: translate(0, 0) rotate(0deg);
+                    }
+                    25% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(90deg);
+                    }
+                    50% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(180deg);
+                    }
+                    75% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(270deg);
+                    }
+                    100% {
+                        transform: translate(0, 0) rotate(360deg);
+                    }
+                }
+                `;
+                
+                const styleSheet = document.createElement('style');
+                styleSheet.textContent = keyframes;
+                document.head.appendChild(styleSheet);
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // تهيئة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            createParticles();
+        });
+    </script>
+    
+    <!-- API Integration -->
+    <script src="./js/api.js"></script>
+</body>
+</html>

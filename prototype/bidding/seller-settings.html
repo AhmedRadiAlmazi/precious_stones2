@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات | جوهرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <script src="js/theme.js"></script>
+    <script src="js/layout.js"></script>
+</head>
+<body class="theme-transition bg-primary text-primary">
+    <script src="js/api.js"></script>
+    <script>
+        if (checkAuth()) {
+            const user = api.getUser();
+            if (user.account_type !== 'seller') {
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+
+        <div class="sidebar-overlay"></div>
+
+        <main class="dashboard-main">
+
+
+            <div class="dashboard-content">
+                <div class="bg-secondary border border-color rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-primary mb-6">الملف الشخصي</h3>
+                    <form id="profile-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">الاسم الأول</label>
+                                <input type="text" id="first-name" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">الاسم الأخير</label>
+                                <input type="text" id="last-name" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-primary mb-2">البريد الإلكتروني</label>
+                            <input type="email" id="email" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-primary mb-2">رقم الهاتف</label>
+                            <input type="tel" id="phone" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-primary mb-2">العنوان</label>
+                            <textarea id="address" rows="3" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">المدينة</label>
+                                <input type="text" id="city" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">الدولة</label>
+                                <input type="text" id="country" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                            </div>
+                        </div>
+                        <button type="submit" class="flex-1 bg-tertiary text-primary py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">
+                            <i class="fas fa-save ml-2"></i>حفظ التغييرات
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="./js/api.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        if (!checkAuth()) {}
+        const user = api.getUser();
+        if (user.account_type !== 'seller') {
+            alert('هذه الصفحة للبائعين فقط!');
+            setTimeout(() => window.location.href = '../index.html', 2000);
+        }
+
+        async function loadProfile() {
+            try {
+                const response = await api.getSellerProfile();
+                const profile = response.data;
+                
+                document.getElementById('first-name').value = profile.first_name || '';
+                document.getElementById('last-name').value = profile.last_name || '';
+                document.getElementById('email').value = profile.email || '';
+                document.getElementById('phone').value = profile.phone || '';
+                document.getElementById('address').value = profile.address || '';
+                document.getElementById('city').value = profile.city || '';
+                document.getElementById('country').value = profile.country || '';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                ui.showError('فشل تحميل الملف الشخصي');
+            }
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                country: document.getElementById('country').value,
+            };
+
+            try {
+                await api.updateSellerProfile(data);
+                ui.showSuccess('تم تحديث الملف الشخصي بنجاح!');
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                ui.showError(error.message || 'فشل تحديث الملف الشخصي');
+            }
+        });
+
+        loadProfile();
+    </script>
+</body>
+</html>

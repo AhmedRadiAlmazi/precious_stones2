@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات النظام | جوهرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 500: '#D4AF37', 600: '#B8860B' },
+                        charcoal: { 800: '#1a1a1a', 900: '#0d0d0d' }
+                    },
+                    fontFamily: { 'cairo': ['Cairo', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="theme-transition bg-primary text-primary">
+    <script src="js/layout.js"></script>
+    <style>
+        /* Force correct responsive behavior */
+        @media (max-width: 1024px) {
+            .dashboard-main {
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .dashboard-sidebar {
+                transform: translateX(100%);
+            }
+            .dashboard-sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        /* Ensure table scrolling */
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+            max-width: 100vw;
+        }
+    </style>
+    <script src="js/api.js"></script>
+    <script>
+        if (checkAuth()) {
+            const user = api.getUser();
+            const isAdmin = user && user.roles && user.roles.some(r => r.name === 'admin');
+            if (!isAdmin) {
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header is injected by layout.js -->
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Settings Tabs -->
+                <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                    <button onclick="switchTab('general')" id="tab-general" class="tab-btn px-6 py-3 rounded-lg font-semibold transition border-b-2 border-gold text-gold whitespace-nowrap">
+                        <i class="fas fa-globe ml-2"></i>
+                        عام
+                    </button>
+                    <button onclick="switchTab('auctions')" id="tab-auctions" class="tab-btn px-6 py-3 rounded-lg font-semibold transition border-b-2 border-transparent text-secondary whitespace-nowrap">
+                        <i class="fas fa-gavel ml-2"></i>
+                        المزادات
+                    </button>
+                    <button onclick="switchTab('email')" id="tab-email" class="tab-btn px-6 py-3 rounded-lg font-semibold transition border-b-2 border-transparent text-secondary whitespace-nowrap">
+                        <i class="fas fa-envelope ml-2"></i>
+                        البريد الإلكتروني
+                    </button>
+                    <button onclick="switchTab('payment')" id="tab-payment" class="tab-btn px-6 py-3 rounded-lg font-semibold transition border-b-2 border-transparent text-secondary whitespace-nowrap">
+                        <i class="fas fa-credit-card ml-2"></i>
+                        الدفع
+                    </button>
+                    <button onclick="switchTab('security')" id="tab-security" class="tab-btn px-6 py-3 rounded-lg font-semibold transition border-b-2 border-transparent text-secondary whitespace-nowrap">
+                        <i class="fas fa-shield-alt ml-2"></i>
+                        الأمان
+                    </button>
+                </div>
+
+                <!-- General Settings -->
+                <div id="content-general" class="tab-content">
+                    <div class="bg-secondary border border-color rounded-xl p-6">
+                        <h2 class="text-xl font-bold text-primary mb-6">الإعدادات العامة</h2>
+                        <form id="general-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">اسم الموقع</label>
+                                    <input type="text" id="site-name" value="جوهرة - منصة مزادات الأحجار الكريمة"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">البريد الإلكتروني للموقع</label>
+                                    <input type="email" id="site-email" value="info@jawharah.com"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">رقم الهاتف</label>
+                                    <input type="tel" id="site-phone" value="+967 775497454"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">العملة</label>
+                                    <select id="site-currency" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                        <option value="SAR">ريال سعودي (ر.س)</option>
+                                        <option value="USD">دولار أمريكي ($)</option>
+                                        <option value="EUR">يورو (€)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-primary mb-2">وصف الموقع</label>
+                                <textarea id="site-description" rows="3"
+                                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">منصة رائدة لمزادات الأحجار الكريمة والمجوهرات الفاخرة فيالجمهورية اليمنية </textarea>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <input type="checkbox" id="site-maintenance" class="w-4 h-4">
+                                <label for="site-maintenance" class="text-sm text-primary">وضع الصيانة (إيقاف الموقع مؤقتاً)</label>
+                            </div>
+                            <button type="submit" class="flex-1 bg-tertiary text-primary py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">
+                                <i class="fas fa-save ml-2"></i>
+                                حفظ التغييرات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Auctions Settings -->
+                <div id="content-auctions" class="tab-content hidden">
+                    <div class="bg-secondary border border-color rounded-xl p-6">
+                        <h2 class="text-xl font-bold text-primary mb-6">إعدادات المزادات</h2>
+                        <form id="auctions-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">المدة الافتراضية للمزاد (أيام)</label>
+                                    <input type="number" id="default-duration" value="7" min="1"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">الحد الأدنى للزيادة (%)</label>
+                                    <input type="number" id="min-increment" value="5" min="1" step="0.1"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">عمولة المنصة (%)</label>
+                                    <input type="number" id="platform-commission" value="10" min="0" max="100" step="0.1"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">الحد الأدنى لسعر البداية (ر.س)</label>
+                                    <input type="number" id="min-starting-price" value="100" min="0"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="auto-approve-auctions" class="w-4 h-4">
+                                    <label for="auto-approve-auctions" class="text-sm text-primary">الموافقة التلقائية على المزادات</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="allow-auction-extension" checked class="w-4 h-4">
+                                    <label for="allow-auction-extension" class="text-sm text-primary">السماح بتمديد المزاد تلقائياً عند المزايدة في آخر دقيقة</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="require-seller-approval" checked class="w-4 h-4">
+                                    <label for="require-seller-approval" class="text-sm text-primary">يتطلب موافقة البائع قبل النشر</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="gold-gradient text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                                <i class="fas fa-save ml-2"></i>
+                                حفظ التغييرات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Email Settings -->
+                <div id="content-email" class="tab-content hidden">
+                    <div class="bg-secondary border border-color rounded-xl p-6">
+                        <h2 class="text-xl font-bold text-primary mb-6">إعدادات البريد الإلكتروني</h2>
+                        <form id="email-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">خادم SMTP</label>
+                                    <input type="text" id="smtp-host" value="smtp.gmail.com"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">منفذ SMTP</label>
+                                    <input type="number" id="smtp-port" value="587"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">اسم المستخدم</label>
+                                    <input type="text" id="smtp-username" value="noreply@jawharah.com"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">كلمة المرور</label>
+                                    <input type="password" id="smtp-password" value="••••••••"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">التشفير</label>
+                                    <select id="smtp-encryption" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                        <option value="tls">TLS</option>
+                                        <option value="ssl">SSL</option>
+                                        <option value="none">بدون تشفير</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="send-welcome-email" checked class="w-4 h-4">
+                                    <label for="send-welcome-email" class="text-sm text-primary">إرسال بريد ترحيبي للمستخدمين الجدد</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="send-auction-notifications" checked class="w-4 h-4">
+                                    <label for="send-auction-notifications" class="text-sm text-primary">إرسال إشعارات المزادات</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="send-bid-notifications" checked class="w-4 h-4">
+                                    <label for="send-bid-notifications" class="text-sm text-primary">إرسال إشعارات المزايدات</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="flex-1 bg-tertiary text-primary py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">
+                                <i class="fas fa-save ml-2"></i>
+                                حفظ التغييرات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Payment Settings -->
+                <div id="content-payment" class="tab-content hidden">
+                    <div class="bg-secondary border border-color rounded-xl p-6">
+                        <h2 class="text-xl font-bold text-primary mb-6">إعدادات الدفع</h2>
+                        <form id="payment-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">بوابة الدفع</label>
+                                    <select id="payment-gateway" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                        <option value="stripe">Stripe</option>
+                                        <option value="paypal">PayPal</option>
+                                        <option value="tap">Tap Payments</option>
+                                        <option value="moyasar">Moyasar</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">وضع الاختبار</label>
+                                    <select id="payment-mode" class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                        <option value="test">وضع الاختبار</option>
+                                        <option value="live">وضع الإنتاج</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">مفتاح API العام</label>
+                                    <input type="text" id="payment-public-key" value="pk_test_••••••••"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">مفتاح API السري</label>
+                                    <input type="password" id="payment-secret-key" value="sk_test_••••••••"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="accept-credit-cards" checked class="w-4 h-4">
+                                    <label for="accept-credit-cards" class="text-sm text-primary">قبول بطاقات الائتمان</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="accept-apple-pay" class="w-4 h-4">
+                                    <label for="accept-apple-pay" class="text-sm text-primary">قبول Apple Pay</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="accept-mada" checked class="w-4 h-4">
+                                    <label for="accept-mada" class="text-sm text-primary">قبول مدى</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="gold-gradient text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                                <i class="fas fa-save ml-2"></i>
+                                حفظ التغييرات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div id="content-security" class="tab-content hidden">
+                    <div class="bg-secondary border border-color rounded-xl p-6">
+                        <h2 class="text-xl font-bold text-primary mb-6">إعدادات الأمان</h2>
+                        <form id="security-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">الحد الأقصى لمحاولات تسجيل الدخول</label>
+                                    <input type="number" id="max-login-attempts" value="5" min="1"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">مدة الحظر (دقائق)</label>
+                                    <input type="number" id="lockout-duration" value="30" min="1"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">الحد الأدنى لطول كلمة المرور</label>
+                                    <input type="number" id="min-password-length" value="8" min="6"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-primary mb-2">مدة صلاحية الجلسة (دقائق)</label>
+                                    <input type="number" id="session-lifetime" value="120" min="30"
+                                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="require-email-verification" checked class="w-4 h-4">
+                                    <label for="require-email-verification" class="text-sm text-primary">يتطلب التحقق من البريد الإلكتروني</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="enable-two-factor" class="w-4 h-4">
+                                    <label for="enable-two-factor" class="text-sm text-primary">تفعيل المصادقة الثنائية</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="require-strong-password" checked class="w-4 h-4">
+                                    <label for="require-strong-password" class="text-sm text-primary">يتطلب كلمة مرور قوية (أحرف كبيرة، صغيرة، أرقام، رموز)</label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="checkbox" id="enable-recaptcha" class="w-4 h-4">
+                                    <label for="enable-recaptcha" class="text-sm text-primary">تفعيل reCAPTCHA</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="flex-1 bg-tertiary text-primary py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">
+                                <i class="fas fa-save ml-2"></i>
+                                حفظ التغييرات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="./js/api.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Check authentication
+        if (!checkAuth()) {
+            // Will redirect to login
+        }
+
+        const user = api.getUser();
+        const isAdmin = user.roles && user.roles.some(role => role.name === 'admin');
+        if (!isAdmin) {
+            alert('هذه الصفحة للمديرين فقط!');
+            setTimeout(() => window.location.href = '../index.html', 2000);
+        }
+
+        // Load settings on page load
+        async function loadSettings(group) {
+            try {
+                const response = await api.getSettings(group);
+                const settings = response.data;
+                
+                // Populate form fields based on group
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key.replace(/_/g, '-'));
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = settings[key];
+                        } else {
+                            element.value = settings[key];
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                ui.showError('فشل تحميل الإعدادات');
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-gold', 'text-gold');
+                btn.classList.add('text-secondary', 'border-transparent');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('border-gold', 'text-gold');
+            document.getElementById(`tab-${tab}`).classList.remove('text-secondary', 'border-transparent');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+
+            // Load settings for this group
+            loadSettings(tab);
+        }
+
+        // Helper function to collect form data
+        function collectFormData(formId, group) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input, select, textarea');
+            const settings = {};
+
+            inputs.forEach(input => {
+                const key = input.id.replace(/-/g, '_');
+                let value, type;
+
+                if (input.type === 'checkbox') {
+                    value = input.checked ? '1' : '0';
+                    type = 'boolean';
+                } else if (input.type === 'number') {
+                    value = input.value;
+                    type = 'integer';
+                } else {
+                    value = input.value;
+                    type = 'string';
+                }
+
+                settings[key] = { value, type };
+            });
+
+            return settings;
+        }
+
+        // Form submissions
+        document.getElementById('general-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const settings = collectFormData('general-form', 'general');
+            
+            try {
+                await api.updateSettings(settings, 'general');
+                ui.showSuccess('تم حفظ الإعدادات العامة بنجاح!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                ui.showError(error.message || 'فشل حفظ الإعدادات');
+            }
+        });
+
+        document.getElementById('auctions-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const settings = collectFormData('auctions-form', 'auctions');
+            
+            try {
+                await api.updateSettings(settings, 'auctions');
+                ui.showSuccess('تم حفظ إعدادات المزادات بنجاح!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                ui.showError(error.message || 'فشل حفظ الإعدادات');
+            }
+        });
+
+        document.getElementById('email-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const settings = collectFormData('email-form', 'email');
+            
+            try {
+                await api.updateSettings(settings, 'email');
+                ui.showSuccess('تم حفظ إعدادات البريد الإلكتروني بنجاح!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                ui.showError(error.message || 'فشل حفظ الإعدادات');
+            }
+        });
+
+        document.getElementById('payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const settings = collectFormData('payment-form', 'payment');
+            
+            try {
+                await api.updateSettings(settings, 'payment');
+                ui.showSuccess('تم حفظ إعدادات الدفع بنجاح!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                ui.showError(error.message || 'فشل حفظ الإعدادات');
+            }
+        });
+
+        document.getElementById('security-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const settings = collectFormData('security-form', 'security');
+            
+            try {
+                await api.updateSettings(settings, 'security');
+                ui.showSuccess('تم حفظ إعدادات الأمان بنجاح!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                ui.showError(error.message || 'فشل حفظ الإعدادات');
+            }
+        });
+
+        // Load general settings on page load
+        loadSettings('general');
+    </script>
+</body>
+</html>

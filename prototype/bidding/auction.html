@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="responsive.css">
+    <script src="js/theme.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -32,16 +33,14 @@
         }
     </script>
     <style>
-        :root {
-            --gold: #D4AF37;
-            --dark-gold: #B8860B;
-            --charcoal: #1a1a1a;
-            --light-charcoal: #2d2d2d;
+        /* Utilizing variables from styles.css */
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
         }
         
-        body {
-            font-family: 'Cairo', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+        .gold-text {
+            color: var(--gold);
         }
         
         .gold-gradient {
@@ -109,31 +108,8 @@
         .theme-transition {
             transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
         }
-        
-        .light-theme {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-        }
-        
-        .dark-theme {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #475569;
-        }
-        
-        .bg-primary { background-color: var(--bg-primary); }
-        .bg-secondary { background-color: var(--bg-secondary); }
-        .bg-tertiary { background-color: var(--bg-tertiary); }
-        .text-primary { color: var(--text-primary); }
-        .text-secondary { color: var(--text-secondary); }
-        .border-color { border-color: var(--border-color); }
+
+        /* theme vars removed - using styles.css */
         
         /* تخصيص شريط التمرير */
         ::-webkit-scrollbar {
@@ -159,10 +135,18 @@
             transform: translateY(100%);
             transition: transform 0.3s ease-out;
         }
-        
-        .filter-mobile.open {
-            transform: translateY(0);
-        }
+                /* Prevent number jitter/shaking in countdown */
+            .countdown-timer-text {
+                font-feature-settings: "tnum";
+                font-variant-numeric: tabular-nums;
+                /* Fallback to monospace if the primary font doesn't support tabular nums well */
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+                letter-spacing: 0.5px;
+            }
+
+            .filter-mobile.open {
+                transform: translateY(0);
+            }
         
         /* تحسينات للشريط الجانبي في الشاشات الصغيرة */
         @media (max-width: 768px) {
@@ -215,10 +199,12 @@
             <div class="flex justify-between items-center">
                 <!-- الشعار -->
                 <div class="flex items-center">
-                    <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
-                        <i class="fas fa-gem text-white text-xl"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                    <a href="../index.html" class="flex items-center" aria-label="العودة إلى الصفحة الرئيسية">
+                        <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
+                            <i class="fas fa-gem text-white text-xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                    </a>
                 </div>
                 
                 <!-- شريط البحث -->
@@ -248,8 +234,8 @@
                 <!-- الأيقونات -->
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <!-- زر تبديل الوضع -->
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-tertiary transition">
-                        <i id="theme-icon" class="fas fa-moon text-secondary"></i>
+                    <button id="theme-toggle" class="theme-toggle p-2 rounded-full hover:bg-tertiary transition">
+                        <i id="theme-icon" class="theme-toggle-icon fas fa-moon text-secondary"></i>
                     </button>
                     
                     <button class="relative p-2 rounded-full hover:bg-tertiary transition">
@@ -452,7 +438,7 @@
                     
                     <!-- أزرار التصفية -->
                     <div class="flex space-x-2 rtl:space-x-reverse">
-                        <button class="flex-1 gold-gradient text-white font-bold py-2 px-4 rounded-lg">
+                        <button class="flex-1 bg-tertiary text-primary py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">
                             تطبيق
                         </button>
                         <button class="flex-1 bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
@@ -493,272 +479,22 @@
                 </div>
                 
                 <!-- شبكة المزادات -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- مزاد 1 -->
-                    <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                        <div class="relative">
-                            <div class="h-48 overflow-hidden">
-                                <img src="./imges/ياقوت وردي من ميانمار.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                            </div>
-                            <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded pulse-glow">
-                                ينتهي قريباً
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="certification-seal">
-                                <i class="fas fa-award text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-primary">ياقوت أزرق نادر من سريلانكا</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-500 font-bold">18,500 ر.س</span>
-                                <span class="text-secondary text-sm">سريلانكا</span>
-                            </div>
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-secondary">الوقت المتبقي</span>
-                                    <span class="countdown-flash font-bold">00:45:22</span>
-                                </div>
-                                <div class="w-full bg-tertiary rounded-full h-2">
-                                    <div class="bg-red-500 h-2 rounded-full" style="width: 10%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-secondary">12 مزايد</span>
-                                <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
-                                    زايد الآن
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- مزاد 2 -->
-                    <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                        <div class="relative">
-                            <div class="h-48 overflow-hidden">
-                                <img src="./imges/زمرد كولومبي نقي عالي الجودة.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                            </div>
-                            <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
-                                نشط
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="certification-seal">
-                                <i class="fas fa-award text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-primary">زمرد كولومبي نقي عالي الجودة</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-500 font-bold">22,750 ر.س</span>
-                                <span class="text-secondary text-sm">كولومبيا</span>
-                            </div>
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-secondary">الوقت المتبقي</span>
-                                    <span class="font-bold">2 يوم 04:22:15</span>
-                                </div>
-                                <div class="w-full bg-tertiary rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: 65%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-secondary">7 مزايدين</span>
-                                <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
-                                    زايد الآن
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- مزاد 3 -->
-                    <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                        <div class="relative">
-                            <div class="h-48 overflow-hidden">
-                                <img src="./imges/ألماس وردي نادر.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                            </div>
-                            <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
-                                نشط
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
-                                    <i class="fas fa-heart text-red-500"></i>
-                                </button>
-                            </div>
-                            <div class="certification-seal">
-                                <i class="fas fa-award text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-primary">ألماس وردي نادر من جنوب أفريقيا</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-500 font-bold">125,000 ر.س</span>
-                                <span class="text-secondary text-sm">جنوب أفريقيا</span>
-                            </div>
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-secondary">الوقت المتبقي</span>
-                                    <span class="font-bold">5 يوم 12:45:22</span>
-                                </div>
-                                <div class="w-full bg-tertiary rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-secondary">3 مزايدين</span>
-                                <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
-                                    زايد الآن
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- مزاد 4 -->
-                    <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                        <div class="relative">
-                            <div class="h-48 overflow-hidden">
-                                <img src="./imges/ياقوت وردي من ميانمار.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                            </div>
-                            <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
-                                جديد
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="certification-seal">
-                                <i class="fas fa-award text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-primary">ياقوت وردي نقي من ميانمار</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-500 font-bold">15,300 ر.س</span>
-                                <span class="text-secondary text-sm">ميانمار</span>
-                            </div>
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-secondary">الوقت المتبقي</span>
-                                    <span class="font-bold">7 يوم 08:15:33</span>
-                                </div>
-                                <div class="w-full bg-tertiary rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: 90%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-secondary">0 مزايدين</span>
-                                <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
-                                    زايد الآن
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- مزاد 5 -->
-                    <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                        <div class="relative">
-                            <div class="h-48 overflow-hidden">
-                                <img src="./imges/عقيق نادر من اليمن بلون فريد2.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                            </div>
-                            <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded pulse-glow">
-                                ينتهي قريباً
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="certification-seal">
-                                <i class="fas fa-award text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-primary">عقيق نادر من اليمن بلون فريد</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-500 font-bold">8,500 ر.س</span>
-                                <span class="text-secondary text-sm">اليمن</span>
-                            </div>
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-secondary">الوقت المتبقي</span>
-                                    <span class="countdown-flash font-bold">01:15:47</span>
-                                </div>
-                                <div class="w-full bg-tertiary rounded-full h-2">
-                                    <div class="bg-red-500 h-2 rounded-full" style="width: 15%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-secondary">9 مزايدين</span>
-                                <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
-                                    زايد الآن
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- مزاد 6 -->
-                    <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
-                        <div class="relative">
-                            <div class="h-48 overflow-hidden">
-                                <img src="./imges/توباز أزرق برازيلي شفاف.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
-                            </div>
-                            <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
-                                نشط
-                            </div>
-                            <div class="absolute top-4 right-4">
-                                <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="certification-seal">
-                                <i class="fas fa-award text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-primary">توباز أزرق برازيلي شفاف</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-500 font-bold">12,300 ر.س</span>
-                                <span class="text-secondary text-sm">البرازيل</span>
-                            </div>
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-secondary">الوقت المتبقي</span>
-                                    <span class="font-bold">3 يوم 16:22:05</span>
-                                </div>
-                                <div class="w-full bg-tertiary rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: 70%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-secondary">5 مزايدين</span>
-                                <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm">
-                                    زايد الآن
-                                </button>
-                            </div>
-                        </div>
+                <div id="auctions-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Loading State -->
+                     <div class="col-span-full text-center py-20">
+                        <i class="fas fa-spinner fa-spin text-4xl text-yellow-500"></i>
+                        <p class="mt-4 text-secondary">جاري تحميل المزادات...</p>
                     </div>
                 </div>
                 
                 <!-- ترقيم الصفحات -->
-                <div class="flex justify-center mt-12">
+                <div id="pagination-container" class="flex justify-center mt-12 hidden">
                     <nav class="flex items-center space-x-2 rtl:space-x-reverse">
                         <button class="bg-secondary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                         <button class="bg-secondary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color font-bold">1</button>
-                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">2</button>
-                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">3</button>
-                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">4</button>
                         <span class="text-secondary px-2">...</span>
-                        <button class="bg-tertiary hover:bg-opacity-80 text-primary w-10 h-10 rounded-lg transition border border-color">10</button>
                         <button class="bg-secondary hover:bg-opacity-80 text-primary p-2 rounded-lg transition border border-color">
                             <i class="fas fa-chevron-left"></i>
                         </button>
@@ -774,9 +510,11 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center mb-4">
-                        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center">
-                            <i class="fas fa-gem text-white"></i>
-                        </div>
+                        <a href="../index.html" aria-label="العودة إلى الصفحة الرئيسية">
+                            <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center">
+                                <i class="fas fa-gem text-white"></i>
+                            </div>
+                        </a>
                         <h2 class="text-xl font-bold mr-3 gold-text">جوهرة</h2>
                     </div>
                     <p class="text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة في العالم العربي.</p>
@@ -824,64 +562,246 @@
             </div>
         </div>
     </footer>
-    
-    <script src="app.js"></script>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
     <script>
-        // التحكم في الوضع النهاري والليلي
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const body = document.body;
-        
-        // التحقق من تفضيلات النظام والمستخدم
-        function getSystemTheme() {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        
-        function getUserPreference() {
-            return localStorage.getItem('theme');
-        }
-        
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                body.classList.add('dark-theme');
-                body.classList.remove('light-theme');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                body.classList.add('light-theme');
-                body.classList.remove('dark-theme');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Theme Management
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const htmlElement = document.documentElement;
+
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    htmlElement.classList.add('dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    htmlElement.classList.remove('dark');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+                localStorage.setItem('theme', theme);
             }
-        }
-        
-        // تهيئة الوضع الأولي
-        function initTheme() {
-            const userPreference = getUserPreference();
-            if (userPreference) {
-                setTheme(userPreference);
-            } else {
-                const systemTheme = getSystemTheme();
-                setTheme(systemTheme);
+
+            // Init Theme
+            const savedTheme = localStorage.getItem('theme') || 
+                             (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            setTheme(savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
+                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+
+            // Mobile Menu
+            const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
             }
-        }
-        
-        // تبديل الوضع
-        function toggleTheme() {
-            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            setTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-        
-        // الاستماع لتغيرات نظام التشغيل
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!getUserPreference()) {
-                setTheme(e.matches ? 'dark' : 'light');
+
+            // Auction Logic
+            const auctionsContainer = document.getElementById('auctions-container');
+
+            function parseDateUTC(dateString) {
+                if (!dateString) return null;
+                // Ensure ISO format with Z for UTC
+                const cleanDate = dateString.replace(' ', 'T') + (dateString.includes('Z') ? '' : 'Z');
+                const timestamp = new Date(cleanDate).getTime();
+                return isNaN(timestamp) ? null : timestamp;
             }
+
+            function formatTimeRemaining(endTimeStr) {
+                const now = new Date().getTime();
+                const end = parseDateUTC(endTimeStr);
+                
+                if (!end) return 'توقيت غير صالح';
+
+                const diff = end - now;
+
+                if (diff <= 0) return 'منتهي';
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (days > 0) return `${days} يوم ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            let countdownInterval;
+            function startCountdownTimers() {
+                if (countdownInterval) clearInterval(countdownInterval);
+                
+                const update = () => {
+                    const timers = document.querySelectorAll('.countdown-timer-text');
+                    timers.forEach(timer => {
+                        const endTime = timer.dataset.endTime;
+                        if (endTime) {
+                            const text = formatTimeRemaining(endTime);
+                            timer.innerText = text;
+                            
+                            // Handle expiry
+                            if (text === 'منتهي') {
+                                timer.classList.remove('text-yellow-500', 'text-white', 'countdown-timer-text');
+                                timer.classList.add('text-red-500', 'font-bold');
+                                
+                                const card = timer.closest('.card-hover');
+                                if (card) {
+                                    const btn = card.querySelector('button');
+                                    const statusBadge = card.querySelector('.absolute.top-4.left-4');
+                                    
+                                    if (btn && !btn.disabled) {
+                                        btn.disabled = true;
+                                        btn.classList.remove('gold-gradient', 'ripple');
+                                        btn.classList.add('bg-gray-400', 'text-white', 'cursor-not-allowed');
+                                        btn.innerText = 'انتهى المزاد';
+                                    }
+                                    
+                                    if (statusBadge && !statusBadge.classList.contains('bg-gray-500')) {
+                                        statusBadge.className = 'absolute top-4 left-4 bg-gray-500 text-white text-xs font-bold py-1 px-2 rounded';
+                                        statusBadge.innerText = 'منتهي';
+                                    }
+                                }
+                            } else if (text === 'توقيت غير صالح') {
+                                timer.innerText = '--:--:--';
+                                console.warn('Invalid auction end time:', endTime);
+                            }
+                        }
+                    });
+                };
+                
+                update(); // Initial call
+                countdownInterval = setInterval(update, 1000);
+            }
+
+            async function loadAuctions() {
+                try {
+                    const response = await api.getAuctions({ limit: 20 });
+                    let auctions = response.data?.data || response.data || [];
+
+                    if (auctions.length === 0) {
+                        auctionsContainer.innerHTML = '<p class="text-center col-span-full text-secondary py-10">لا توجد مزادات متاحة حالياً.</p>';
+                        return;
+                    }
+
+                    // Process and Sort
+                    const now = new Date().getTime();
+                    const processedAuctions = auctions.map(auction => {
+                        const endTime = parseDateUTC(auction.end_time);
+                        return {
+                            ...auction,
+                            _endTimeParsed: endTime || 0, // Fallback for invalid dates
+                            _isExpired: (endTime || 0) <= now
+                        };
+                    });
+
+                    processedAuctions.sort((a, b) => {
+                        if (a._isExpired === b._isExpired) {
+                            return a._isExpired ? b._endTimeParsed - a._endTimeParsed : a._endTimeParsed - b._endTimeParsed;
+                        }
+                        return a._isExpired ? 1 : -1;
+                    });
+
+                    // Render
+                    auctionsContainer.innerHTML = processedAuctions.map(auction => {
+                        const isExpired = auction._isExpired;
+                        const statusColor = isExpired ? 'bg-gray-500' : 'bg-green-500';
+                        const statusText = isExpired ? 'منتهي' : 'نشط';
+                        const btnState = isExpired ? 'disabled class="bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed text-sm"' : 'class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple text-sm" onclick="window.location.href=\'auction-details.html?id=' + auction.id + '\'"';
+                        const btnText = isExpired ? 'انتهى المزاد' : 'زايد الآن';
+                        const countdownDisplay = isExpired ? 
+                            '<span class="text-red-500 font-bold">منتهي</span>' : 
+                            `<span class="countdown-timer-text font-bold dir-ltr" data-end-time="${auction.end_time}">--:--:--</span>`;
+
+                        const progressWidth = isExpired ? 100 : 50; 
+                        const progressColor = isExpired ? 'bg-gray-500' : 'bg-green-500';
+                        
+                        // Handle image URL
+                        let imageUrl = '../imges/ياقوت أزرق نادر.jpeg'; // Default
+                        if (auction.product && auction.product.images && auction.product.images.length > 0) {
+                            const img = auction.product.images[0];
+                            if (img.startsWith('http')) {
+                                imageUrl = img;
+                            } else if (img.startsWith('/')) {
+                                // Prepend API domain (assuming API_BASE_URL is http://localhost:8800/api/v1)
+                                const baseUrl = API_BASE_URL.replace('/api/v1', '');
+                                imageUrl = `${baseUrl}${img}`;
+                            } else {
+                                imageUrl = img; // Fallback for other formats
+                            }
+                        }
+
+                        return `
+                        <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color shadow-lg transition-all duration-300">
+                            <div class="relative">
+                                <div class="h-48 overflow-hidden">
+                                    <img src="${imageUrl}" alt="${auction.product?.name || 'مزاد'}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="absolute top-4 left-4 ${statusColor} text-white text-xs font-bold py-1 px-2 rounded">
+                                    ${statusText}
+                                </div>
+                                <div class="absolute top-4 right-4">
+                                    <button class="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="certification-seal">
+                                    <i class="fas fa-award text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-2 text-primary truncate">${auction.product?.name || 'مزاد بدون اسم'}</h3>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-yellow-500 font-bold">${auction.current_bid || auction.starting_price} ر.س</span>
+                                    <span class="text-secondary text-sm">${auction.product?.country || 'غير محدد'}</span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-secondary">الوقت المتبقي</span>
+                                        ${countdownDisplay}
+                                    </div>
+                                    <div class="w-full bg-tertiary rounded-full h-2">
+                                        <div class="${progressColor} h-2 rounded-full" style="width: ${progressWidth}%"></div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-secondary">${auction.bids_count || 0} مزايد</span>
+                                    <button ${btnState}>
+                                        ${btnText}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+
+                    startCountdownTimers();
+                    document.getElementById('pagination-container').classList.remove('hidden');
+
+                } catch (error) {
+                    console.error('Error loading auctions:', error);
+                    auctionsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-10">
+                            <p class="text-red-500">حدث خطأ أثناء تحميل المزادات.</p>
+                            <button onclick="loadAuctions()" class="mt-4 text-yellow-500 hover:underline">إعادة المحاولة</button>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial Load
+            loadAuctions();
         });
-        
+    </script>
+</body>
+</html>    <script src="app.js"></script>
+    <script>
         // التحكم في الشريط الجانبي للجوال
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -909,7 +829,7 @@
         });
 
         // إضافة المستمعين للأحداث
-        themeToggle.addEventListener('click', toggleTheme);
+        // themeToggle.addEventListener('click', toggleTheme); // Handled by theme.js
         mobileFilterToggle.addEventListener('click', openSidebar);
         closeSidebar.addEventListener('click', closeSidebarFunc);
         sidebarOverlay.addEventListener('click', closeSidebarFunc);
@@ -920,17 +840,14 @@
             countdownElements.forEach(element => {
                 // في التطبيق الحقيقي، سيكون هناك حساب الوقت المتبقي الحقيقي
                 // هنا نستخدم قيمة عشوائية للعرض فقط
-                const hours = Math.floor(Math.random() * 2);
-                const minutes = Math.floor(Math.random() * 60);
-                const seconds = Math.floor(Math.random() * 60);
-                
-                element.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                // This logic is mostly placeholder or handled by api.js updates if integrated
+                // Keeping ensuring it doesn't break
             });
         }
         
         // تهيئة عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
-            initTheme();
+            // initTheme(); // Handled by theme.js
             updateCountdowns();
             
             // تحديث العدادات كل ثانية
