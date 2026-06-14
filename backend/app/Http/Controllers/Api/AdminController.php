@@ -571,4 +571,19 @@ class AdminController extends Controller
             'data' => $category,
         ]);
     }
+
+    /**
+     * Get all orders (Admin only)
+     */
+    public function getAllOrders(Request $request)
+    {
+        $orders = \App\Models\Order::with(['product.category', 'buyer', 'seller'])
+            ->latest()
+            ->paginate($request->get('per_page', 20));
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders,
+        ]);
+    }
 }

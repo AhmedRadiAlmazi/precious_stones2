@@ -58,10 +58,11 @@
                 ]},
                 { section: 'المبيعات', items: [
                     { label: 'الطلبات', icon: 'fa-shopping-cart', url: 'seller-orders.html' },
-                    { label: 'الإحصائيات', icon: 'fa-chart-line', url: 'seller-stats.html' },
-                    { label: 'الأرباح', icon: 'fa-dollar-sign', url: 'seller-revenue.html' }
+                    { label: 'الإحصائيات', icon: 'fa-chart-line', url: 'seller-statistics.html' },
+                    { label: 'الأرباح', icon: 'fa-dollar-sign', url: 'seller-earnings.html' }
                 ]},
                 { section: 'الإعدادات', items: [
+                    { label: 'إعدادات الملف الشخصي', icon: 'fa-user-cog', url: 'seller-settings.html' },
                     { label: 'العودة للموقع', icon: 'fa-arrow-right', url: '../index.html' }
                 ]}
             ]

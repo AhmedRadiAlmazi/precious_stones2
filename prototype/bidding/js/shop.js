@@ -20,37 +20,67 @@ async function fetchProducts() {
     const productsGrid = document.getElementById('products-grid');
     if (!productsGrid) return; // Guard clause
 
-    // Show loading state (optional)
+    // Show loading state
     productsGrid.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-yellow-500"></i></div>';
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/products?active=1`);
-        if (!response.ok) throw new Error('Failed to fetch products');
+    // Parse URL params for specific product ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
 
-        const data = await response.json();
-        let products = [];
-        
-        // multiple checks for various response structures
-        if (Array.isArray(data)) {
-            // Case 1: Direct array [P1, P2]
-            products = data;
-        } else if (data.data && Array.isArray(data.data)) {
-             // Case 2: { data: [P1, P2] } (Simple wrapper or just accessing the paginated array directly if logic allows)
-            products = data.data;
-        } else if (data.data && data.data.data && Array.isArray(data.data.data)) {
-            // Case 3: { success: true, data: { data: [P1, P2], current_page: 1... } } (Full Pagination in Wrapper)
-            products = data.data.data;
-        } else if (data.current_page && Array.isArray(data.data)) {
-             // Case 4: { data: [P1, P2], current_page: 1... } (Direct Pagination)
-            products = data.data;
-        } else {
-             console.warn('Unexpected product data structure:', data);
+    if (productId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/products/${productId}`);
+            if (!response.ok) throw new Error('Failed to fetch product');
+
+            const data = await response.json();
+            const product = data.data;
+
+            if (product) {
+                renderSingleProduct(product);
+            } else {
+                throw new Error('Product not found');
+            }
+        } catch (error) {
+            console.error('Error fetching single product:', error);
+            productsGrid.innerHTML = `
+                <div class="col-span-full text-center text-red-500 py-10">
+                    <p class="mb-4">فشل تحميل المنتج المطلوب. ربما يكون قد تم حذفه أو لم يعد متوفراً.</p>
+                    <button onclick="clearProductFilter()" class="gold-gradient text-white font-bold py-2.5 px-6 rounded-xl transition">
+                        عرض جميع المنتجات
+                    </button>
+                </div>
+            `;
         }
+    } else {
+        try {
+            const response = await fetch(`${API_BASE_URL}/products?active=1`);
+            if (!response.ok) throw new Error('Failed to fetch products');
 
-        renderProducts(products);
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        productsGrid.innerHTML = '<div class="col-span-full text-center text-red-500 py-10">فشل تحميل المنتجات. يرجى المحاولة لاحقاً.</div>';
+            const data = await response.json();
+            let products = [];
+            
+            // multiple checks for various response structures
+            if (Array.isArray(data)) {
+                // Case 1: Direct array [P1, P2]
+                products = data;
+            } else if (data.data && Array.isArray(data.data)) {
+                 // Case 2: { data: [P1, P2] } (Simple wrapper or just accessing the paginated array directly if logic allows)
+                products = data.data;
+            } else if (data.data && data.data.data && Array.isArray(data.data.data)) {
+                // Case 3: { success: true, data: { data: [P1, P2], current_page: 1... } } (Full Pagination in Wrapper)
+                products = data.data.data;
+            } else if (data.current_page && Array.isArray(data.data)) {
+                 // Case 4: { data: [P1, P2], current_page: 1... } (Direct Pagination)
+                products = data.data;
+            } else {
+                 console.warn('Unexpected product data structure:', data);
+            }
+
+            renderProducts(products);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            productsGrid.innerHTML = '<div class="col-span-full text-center text-red-500 py-10">فشل تحميل المنتجات. يرجى المحاولة لاحقاً.</div>';
+        }
     }
 }
 
@@ -178,3 +208,80 @@ async function requestProduct(productId) {
 
 // Make requestProduct globally available for onclick
 window.requestProduct = requestProduct;
+
+function renderSingleProduct(product) {
+    const productsGrid = document.getElementById('products-grid');
+    productsGrid.innerHTML = '';
+
+    const noImagePlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23e5e7eb' width='400' height='300'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='30' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+    let imageUrl = noImagePlaceholder;
+    if (product.images && product.images.length > 0) {
+        let imgPath = product.images[0];
+        if (imgPath.startsWith('http')) {
+            imageUrl = imgPath;
+        } else {
+            const serverBase = API_BASE_URL.replace('/api/v1', '');
+            imgPath = imgPath.replace(/^\/|storage\//g, ''); 
+            imageUrl = `${serverBase}/storage/${imgPath}`;
+        }
+    }
+
+    const card = document.createElement('div');
+    card.className = 'col-span-full max-w-2xl mx-auto bg-secondary border border-color rounded-2xl overflow-hidden shadow-2xl p-6';
+
+    card.innerHTML = `
+        <div class="bg-yellow-500 bg-opacity-10 border border-yellow-500 text-yellow-500 rounded-xl p-4 mb-6 text-center text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="font-medium"><i class="fas fa-info-circle ml-2"></i>أنت تستعرض تفاصيل منتج واحد فقط حالياً.</span>
+            <button onclick="clearProductFilter()" class="bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-bold py-2 px-4 rounded-lg transition duration-200">
+                عرض جميع المنتجات
+            </button>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-1/2 h-64 overflow-hidden rounded-xl bg-black relative flex items-center justify-center">
+                <img src="${imageUrl}" alt="${product.name}" class="w-full h-full object-cover">
+                ${product.certification ? `
+                <div class="certification-seal">
+                    <i class="fas fa-award text-white text-sm"></i>
+                </div>` : ''}
+            </div>
+            
+            <div class="w-full md:w-1/2 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold mb-3 text-primary">${product.name}</h3>
+                    <p class="text-secondary text-sm mb-4 leading-relaxed">${product.description || 'لا يوجد وصف متاح.'}</p>
+                    
+                    <div class="flex flex-wrap gap-2 text-xs mb-4">
+                        <span class="bg-tertiary text-secondary py-1.5 px-3 rounded-lg border border-color">المنشأ: ${product.country || 'غير محدد'}</span>
+                        <span class="bg-tertiary text-gold py-1.5 px-3 rounded-lg border border-color font-semibold">البائع: ${product.seller ? product.seller.first_name + ' ' + product.seller.last_name : 'غير محدد'}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-yellow-500 font-bold text-2xl">${parseFloat(product.price).toLocaleString()} ر.س</span>
+                        <span class="text-xs text-secondary">المخزون: ${product.stock || 1}</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="requestProduct(${product.id})" class="flex-1 gold-gradient text-white font-bold py-3 px-6 rounded-xl ripple text-sm transition duration-200 transform hover:-translate-y-0.5">
+                            <i class="fas fa-shopping-cart ml-2"></i>طلب المنتج
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    productsGrid.appendChild(card);
+}
+
+function clearProductFilter() {
+    const url = new URL(window.location);
+    url.searchParams.delete('id');
+    window.history.pushState({}, '', url);
+    fetchProducts();
+}
+
+window.clearProductFilter = clearProductFilter;
+window.renderSingleProduct = renderSingleProduct;

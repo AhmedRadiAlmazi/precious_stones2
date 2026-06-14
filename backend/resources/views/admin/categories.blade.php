@@ -1,0 +1,302 @@
+@extends('layouts.dashboard')
+
+@section('title', 'إدارة الفئات | جوهرة')
+
+@section('content')
+<script>
+    if (typeof api !== 'undefined' && api.getUser) {
+        const user = api.getUser();
+        const isAdmin = user && user.roles && user.roles.some(role => role.name === 'admin');
+        if (!isAdmin) {
+            alert('هذه الصفحة للمديرين فقط!');
+            window.location.href = '{{ url("/") }}';
+        }
+    }
+</script>
+
+<!-- Header Actions -->
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+        <input type="text" id="search-categories" placeholder="البحث في الفئات..." 
+            class="bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary w-full md:w-64">
+        <select id="filter-status" class="bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary w-full md:w-auto">
+            <option value="">جميع الحالات</option>
+            <option value="1">نشط</option>
+            <option value="0">غير نشط</option>
+        </select>
+    </div>
+    <button onclick="openAddCategoryModal()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition">
+        <i class="fas fa-plus ml-2"></i>
+        إضافة فئة جديدة
+    </button>
+</div>
+
+<!-- Categories Grid -->
+<div id="categories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="text-center py-12 text-secondary col-span-full">
+        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+        <p>جاري تحميل الفئات...</p>
+    </div>
+</div>
+
+<!-- Add/Edit Category Modal -->
+<div id="category-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-secondary rounded-xl shadow-2xl max-w-md w-full mx-4 border border-color">
+        <div class="p-6 border-b border-color">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-primary" id="modal-title">إضافة فئة جديدة</h2>
+                <button onclick="closeCategoryModal()" class="text-secondary hover:text-primary">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <form id="category-form" class="p-6 space-y-4">
+            <input type="hidden" id="category-id">
+            
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">اسم الفئة *</label>
+                <input type="text" id="category-name" required
+                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">الرمز (Slug) *</label>
+                <input type="text" id="category-slug" required
+                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                <p class="text-xs text-secondary mt-1">مثال: diamond, ruby, emerald</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">الوصف</label>
+                <textarea id="category-description" rows="3"
+                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-primary mb-2">الأيقونة (FontAwesome)</label>
+                <input type="text" id="category-icon" placeholder="fa-gem"
+                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-4 focus:outline-none focus:border-gold text-primary">
+                <p class="text-xs text-secondary mt-1">مثال: fa-gem, fa-ring, fa-crown</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="category-active" checked class="w-4 h-4">
+                <label for="category-active" class="text-sm text-primary">نشط</label>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                    <i class="fas fa-save ml-2"></i>حفظ
+                </button>
+                <button type="button" onclick="closeCategoryModal()" class="flex-1 bg-tertiary text-primary py-3 rounded-lg font-semibold hover:bg-opacity-80 transition border border-color">
+                    إلغاء
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    let categories = [];
+    let editingCategoryId = null;
+
+    async function loadCategories() {
+        try {
+            const params = {};
+            
+            const searchValue = document.getElementById('search-categories').value;
+            if (searchValue) params.search = searchValue;
+            
+            const statusValue = document.getElementById('filter-status').value;
+            if (statusValue !== '') params.is_active = statusValue;
+
+            params.paginate = 'false';
+
+            const response = await api.request('/categories').catch(() => api.getAdminCategories(params));
+            categories = response.data || response || [];
+            displayCategories(categories);
+        } catch (error) {
+            console.error('Error loading categories:', error);
+            ui.showError('فشل تحميل الفئات');
+        }
+    }
+
+    function displayCategories(cats) {
+        const container = document.getElementById('categories-grid');
+        
+        if (cats.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12 text-secondary col-span-full">
+                    <i class="fas fa-tags text-6xl mb-4"></i>
+                    <p class="text-xl">لا توجد فئات</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = cats.map(category => `
+            <div class="bg-secondary border border-color rounded-xl p-6 hover:shadow-lg transition">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center text-white text-xl">
+                            <i class="fas ${category.icon || 'fa-tag'}"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary">${category.name}</h3>
+                            <span class="text-xs text-secondary">${category.slug}</span>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                        category.is_active 
+                            ? 'bg-green-500 bg-opacity-20 text-green-500' 
+                            : 'bg-red-500 bg-opacity-20 text-red-500'
+                    }">
+                        ${category.is_active ? 'نشط' : 'غير نشط'}
+                    </span>
+                </div>
+
+                <p class="text-secondary text-sm mb-4 line-clamp-2">${category.description || 'لا يوجد وصف'}</p>
+
+                <div class="flex items-center justify-between pt-4 border-t border-color">
+                    <span class="text-sm text-secondary">
+                        <i class="fas fa-box ml-1"></i>
+                        ${category.products_count || 0} منتج
+                    </span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleCategoryStatus(${category.id})" 
+                            class="text-sm px-3 py-1 rounded ${category.is_active ? 'bg-red-500 text-red-500' : 'bg-green-500 text-green-500'} bg-opacity-20 hover:bg-opacity-30 transition"
+                            title="${category.is_active ? 'إلغاء التفعيل' : 'تفعيل'}">
+                            <i class="fas fa-${category.is_active ? 'eye-slash' : 'eye'}"></i>
+                        </button>
+                        <button onclick="editCategory(${category.id})" 
+                            class="text-sm px-3 py-1 rounded bg-blue-500 bg-opacity-20 hover:bg-opacity-30 text-blue-500 transition"
+                            title="تعديل">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteCategory(${category.id})" 
+                            class="text-sm px-3 py-1 rounded bg-red-500 bg-opacity-20 hover:bg-opacity-30 text-red-500 transition"
+                            title="حذف">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openAddCategoryModal() {
+        editingCategoryId = null;
+        document.getElementById('modal-title').textContent = 'إضافة فئة جديدة';
+        document.getElementById('category-form').reset();
+        document.getElementById('category-id').value = '';
+        document.getElementById('category-active').checked = true;
+        document.getElementById('category-modal').style.display = 'flex';
+        document.getElementById('category-modal').classList.remove('hidden');
+    }
+
+    function closeCategoryModal() {
+        document.getElementById('category-modal').style.display = 'none';
+        document.getElementById('category-modal').classList.add('hidden');
+        editingCategoryId = null;
+    }
+
+    function editCategory(id) {
+        const category = categories.find(c => c.id === id);
+        if (!category) return;
+
+        editingCategoryId = id;
+        document.getElementById('modal-title').textContent = 'تعديل الفئة';
+        document.getElementById('category-id').value = category.id;
+        document.getElementById('category-name').value = category.name;
+        document.getElementById('category-slug').value = category.slug;
+        document.getElementById('category-description').value = category.description || '';
+        document.getElementById('category-icon').value = category.icon || '';
+        document.getElementById('category-active').checked = category.is_active;
+        document.getElementById('category-modal').style.display = 'flex';
+        document.getElementById('category-modal').classList.remove('hidden');
+    }
+
+    document.getElementById('category-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = {
+            name: document.getElementById('category-name').value,
+            slug: document.getElementById('category-slug').value,
+            description: document.getElementById('category-description').value,
+            icon: document.getElementById('category-icon').value,
+            is_active: document.getElementById('category-active').checked,
+        };
+
+        try {
+            if (editingCategoryId) {
+                await api.updateCategory(editingCategoryId, data);
+                ui.showSuccess('تم تحديث الفئة بنجاح!');
+            } else {
+                await api.createCategory(data);
+                ui.showSuccess('تم إضافة الفئة بنجاح!');
+            }
+            closeCategoryModal();
+            loadCategories();
+        } catch (error) {
+            console.error('Error saving category:', error);
+            ui.showError(error.message || 'فشل حفظ الفئة');
+        }
+    });
+
+    async function toggleCategoryStatus(id) {
+        try {
+            await api.toggleCategoryStatus(id);
+            ui.showSuccess('تم تغيير حالة الفئة!');
+            loadCategories();
+        } catch (error) {
+            console.error('Error toggling status:', error);
+            ui.showError(error.message || 'فشل تغيير الحالة');
+        }
+    }
+
+    async function deleteCategory(id) {
+        if (!confirm('هل أنت متأكد من حذف هذه الفئة؟\n\nملاحظة: لا يمكن حذف الفئات التي تحتوي على منتجات.')) return;
+        try {
+            await api.deleteCategory(id);
+            ui.showSuccess('تم حذف الفئة بنجاح!');
+            loadCategories();
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            ui.showError(error.message || 'فشل حذف الفئة');
+        }
+    }
+
+    document.getElementById('category-name').addEventListener('input', (e) => {
+        if (!editingCategoryId) {
+            const slug = e.target.value
+                .toLowerCase()
+                .replace(/[أإآ]/g, 'a')
+                .replace(/[ة]/g, 'h')
+                .replace(/[ى]/g, 'y')
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '');
+            document.getElementById('category-slug').value = slug;
+        }
+    });
+
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    document.getElementById('search-categories').addEventListener('input', debounce(() => {
+        loadCategories();
+    }, 500));
+
+    document.getElementById('filter-status').addEventListener('change', () => {
+        loadCategories();
+    });
+
+    loadCategories();
+</script>
+@endsection

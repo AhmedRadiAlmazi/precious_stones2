@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | جوهرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
+    <script src="{{ asset('js/theme.js') }}"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            500: '#D4AF37',
+                            600: '#B8860B',
+                        },
+                        charcoal: {
+                            800: '#1a1a1a',
+                            900: '#0d0d0d',
+                        }
+                    },
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --charcoal: #1a1a1a;
+            --light-charcoal: #2d2d2d;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        }
+        
+        .gold-text {
+            color: var(--gold);
+        }
+        
+        .glow {
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+        }
+        
+        .theme-transition {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+        }
+        
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-secondary { background-color: var(--bg-secondary); }
+        .bg-tertiary { background-color: var(--bg-tertiary); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .border-color { border-color: var(--border-color); }
+        
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        
+        .input-focus:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine-effect:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .shine-effect:hover:before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="theme-transition bg-primary text-primary">
+    <!-- الهيدر المبسط -->
+    <header class="bg-secondary sticky top-0 z-50 shadow-lg border-b border-color">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- الشعار -->
+                <div class="flex items-center">
+                    <a href="{{ url('/') }}" class="flex items-center" aria-label="العودة إلى الصفحة الرئيسية">
+                        <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
+                            <i class="fas fa-gem text-white text-xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                    </a>
+                </div>
+                
+                <!-- زر تبديل الوضع -->
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-tertiary transition">
+                    <i id="theme-icon" class="fas fa-moon text-secondary"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="min-h-screen flex items-center justify-center py-12 px-4 relative">
+        <!-- خلفية بجسيمات -->
+        <div class="particles-container" id="particles-container"></div>
+        
+        <div class="relative z-10 w-full max-w-md">
+            <!-- البطاقة -->
+            <div class="bg-secondary rounded-2xl shadow-2xl overflow-hidden border border-color">
+                <!-- الرأس -->
+                <div class="gold-gradient p-8 text-center">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 pulse-glow">
+                        <i class="fas fa-gem text-yellow-600 text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">مرحباً بعودتك</h2>
+                    <p class="text-white text-opacity-90">سجل دخولك للوصول إلى حسابك</p>
+                </div>
+                
+                <!-- النموذج -->
+                <div class="p-8">
+                    <form id="login-form" class="space-y-6">
+                        <!-- البريد الإلكتروني -->
+                        <div>
+                            <label for="email" class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-envelope ml-2 gold-text"></i>
+                                البريد الإلكتروني
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email"
+                                required
+                                class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                placeholder="example@email.com"
+                            >
+                        </div>
+                        
+                        <!-- كلمة المرور -->
+                        <div>
+                            <label for="password" class="block text-sm font-bold mb-2 text-primary">
+                                <i class="fas fa-lock ml-2 gold-text"></i>
+                                كلمة المرور
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password"
+                                    required
+                                    class="w-full bg-tertiary text-primary rounded-lg py-3 px-4 focus:outline-none input-focus border border-color"
+                                    placeholder="••••••••"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="toggle-password"
+                                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-yellow-500"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- تذكرني ونسيت كلمة المرور -->
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-yellow-500 focus:ring-yellow-500">
+                                <span class="mr-2 text-sm text-secondary">تذكرني</span>
+                            </label>
+                            <a href="#" class="text-sm text-yellow-500 hover:text-yellow-400 transition">
+                                نسيت كلمة المرور؟
+                            </a>
+                        </div>
+                        
+                        <!-- زر تسجيل الدخول -->
+                        <button 
+                            type="submit"
+                            class="w-full gold-gradient text-white font-bold py-3 px-6 rounded-lg shine-effect hover:shadow-lg transition"
+                        >
+                            <i class="fas fa-sign-in-alt ml-2"></i>
+                            تسجيل الدخول
+                        </button>
+                    </form>
+                    
+                    <!-- الفاصل -->
+                    <div class="relative my-8">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-color"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-secondary text-secondary">أو سجل الدخول باستخدام</span>
+                        </div>
+                    </div>
+                    
+                    <!-- تسجيل الدخول بوسائل التواصل -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary py-3 rounded-lg transition border border-color">
+                            <i class="fab fa-google text-red-500 text-xl"></i>
+                        </button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary py-3 rounded-lg transition border border-color">
+                            <i class="fab fa-facebook text-blue-600 text-xl"></i>
+                        </button>
+                        <button class="bg-tertiary hover:bg-opacity-80 text-primary py-3 rounded-lg transition border border-color">
+                            <i class="fab fa-apple text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- رابط إنشاء حساب -->
+                    <div class="mt-8 text-center">
+                        <p class="text-secondary">
+                            ليس لديك حساب؟
+                            <a href="{{ url('/register') }}" class="text-yellow-500 hover:text-yellow-400 font-bold transition">
+                                إنشاء حساب جديد
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- رابط العودة -->
+            <div class="mt-6 text-center">
+                <a href="{{ url('/') }}" class="text-secondary hover:text-yellow-500 transition inline-flex items-center">
+                    <i class="fas fa-arrow-right ml-2"></i>
+                    العودة إلى الصفحة الرئيسية
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- API Integration -->
+    <script src="{{ asset('js/api.js') }}"></script>
+    
+    <script>
+        // التحكم في الوضع النهاري والليلي
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        function getUserPreference() {
+            return localStorage.getItem('theme');
+        }
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        
+        function initTheme() {
+            const userPreference = getUserPreference();
+            if (userPreference) {
+                setTheme(userPreference);
+            } else {
+                const systemTheme = getSystemTheme();
+                setTheme(systemTheme);
+            }
+        }
+        
+        function toggleTheme() {
+            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        // إظهار/إخفاء كلمة المرور
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+        
+        // معالجة النموذج
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                // Show loading
+                ui.showLoading(submitButton);
+                
+                // Call API
+                const response = await api.login({ email, password });
+                
+                // Show success message
+                ui.showSuccess(response.message || 'تم تسجيل الدخول بنجاح!');
+                
+                // Get user data
+                const user = api.getUser();
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    const userRoles = user.roles || [];
+                    const isAdmin = userRoles.some(role => role.name === 'admin');
+                    const isSeller = user.account_type === 'seller';
+                    
+                    if (isAdmin) {
+                        window.location.href = '{{ url("/admin/dashboard") }}';
+                    } else if (isSeller) {
+                        window.location.href = '{{ url("/seller/dashboard") }}';
+                    } else {
+                        window.location.href = '{{ url("/") }}';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                ui.hideLoading(submitButton);
+                
+                if (error.errors) {
+                    ui.showValidationErrors(error.errors, loginForm);
+                } else {
+                    ui.showError(error.message || 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.');
+                }
+            }
+        });
+        
+        // تأثير الجسيمات الذهبية
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                const duration = Math.random() * 20 + 10;
+                particle.style.animation = `float ${duration}s linear infinite`;
+                
+                const keyframes = `
+                @keyframes float {
+                    0% {
+                        transform: translate(0, 0) rotate(0deg);
+                    }
+                    25% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(90deg);
+                    }
+                    50% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(180deg);
+                    }
+                    75% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(270deg);
+                    }
+                    100% {
+                        transform: translate(0, 0) rotate(360deg);
+                    }
+                }
+                `;
+                
+                const styleSheet = document.createElement('style');
+                styleSheet.textContent = keyframes;
+                document.head.appendChild(styleSheet);
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // تهيئة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            createParticles();
+        });
+    </script>
+</body>
+</html>

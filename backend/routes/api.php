@@ -89,6 +89,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::put('/products/{id}', [\App\Http\Controllers\Api\AdminController::class, 'updateProduct']);
         Route::delete('/products/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteProduct']);
         Route::post('/products/{id}/toggle-status', [\App\Http\Controllers\Api\AdminController::class, 'toggleProductStatus']);
+        Route::get('/orders', [\App\Http\Controllers\Api\AdminController::class, 'getAllOrders']);
 
         // Category Management
         Route::get('/categories', [\App\Http\Controllers\Api\AdminController::class, 'getAllCategories']);
