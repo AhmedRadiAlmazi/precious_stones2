@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جوهرة | منصة المزادات الفاخرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="bidding/styles.css">
+    <link rel="stylesheet" href="bidding/responsive.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            500: '#D4AF37',
+                            600: '#B8860B',
+                        },
+                        charcoal: {
+                            800: '#1a1a1a',
+                            900: '#0d0d0d',
+                        }
+                    },
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --charcoal: #1a1a1a;
+            --light-charcoal: #2d2d2d;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        }
+        
+        .gold-text {
+            color: var(--gold);
+        }
+        
+        .gold-border {
+            border-color: var(--gold);
+        }
+        
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(212, 175, 55, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(212, 175, 55, 0.1), 0 10px 10px -5px rgba(212, 175, 55, 0.04);
+        }
+        
+        .glow {
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+        }
+        
+        .countdown-flash {
+            animation: countdown-flash 1s infinite;
+        }
+        
+        @keyframes countdown-flash {
+            0% { color: inherit; }
+            50% { color: #FFA500; }
+            100% { color: inherit; }
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+        
+        .ripple:active:after {
+            transform: scale(0, 0);
+            opacity: .2;
+            transition: 0s;
+        }
+        
+        .certification-seal {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 60px;
+            height: 60px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-15deg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine-effect:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .shine-effect:hover:before {
+            left: 100%;
+        }
+        
+        .theme-transition {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+        }
+        
+        /* تأثيرات خاصة للوضع النهاري */
+        .light-theme {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+        }
+        
+        /* تأثيرات خاصة للوضع الليلي */
+        .dark-theme {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
+        }
+        
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-secondary { background-color: var(--bg-secondary); }
+        .bg-tertiary { background-color: var(--bg-tertiary); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .border-color { border-color: var(--border-color); }
+
+        /* تأثيرات إضافية للتنقل السلس */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* تأثيرات الظهور التدريجي */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* تأثير البارالاكس */
+        .parallax {
+            transform: translateY(0);
+            transition: transform 0.1s linear;
+        }
+
+        /* تحسينات للأجهزة المحمولة */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .card-hover:hover {
+                transform: none; /* إزالة الارتفاع على المحمول لتجنب المشاكل */
+            }
+
+            .shine-effect:hover:before {
+                left: 100%;
+            }
+        }
+
+        /* دعم المتصفحات القديمة */
+        @supports not (display: grid) {
+            .grid {
+                display: flex;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body class="theme-transition bg-primary text-primary">
+    <!-- الهيدر الذكي -->
+    <header class="bg-secondary sticky top-0 z-50 shadow-lg border-b border-color">
+        <!-- شريط الأسعار العالمية -->
+        <div class="bg-tertiary py-2 overflow-hidden">
+            <div class="container mx-auto px-4">
+                <div class="flex space-x-8 rtl:space-x-reverse animate-pulse">
+                    <span class="gold-text"><i class="fas fa-gem mr-2"></i>الذهب: 2,415 ر.س/أوقية</span>
+                    <span class="gold-text"><i class="fas fa-gem mr-2"></i>البلاتين: 1,120 ر.س/أوقية</span>
+                    <span class="gold-text"><i class="fas fa-gem mr-2"></i>الماس: 18,350 ر.س/قيراط</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- الشعار -->
+                <div class="flex items-center">
+                    <div class="w-12 h-12 gold-gradient rounded-full flex items-center justify-center glow">
+                        <i class="fas fa-gem text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold mr-3 gold-text">جوهرة</h1>
+                </div>
+                
+                <!-- شريط البحث -->
+                <div class="flex-1 max-w-xl mx-4">
+                    <div class="relative">
+                        <input type="text" placeholder="ابحث عن أحجار كريمة..." class="w-full bg-tertiary text-primary rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-yellow-500 border border-color">
+                        <button class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-yellow-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- القائمة -->
+                <nav class="hidden md:flex space-x-6 rtl:space-x-reverse">
+                    <a href="./bidding/auction.html" class="hover:text-yellow-500 transition">المزادات</a>
+                    <a href="./bidding/theshop.html" class="hover:text-yellow-500 transition">المتجر</a>
+                    <a href="#" class="hover:text-yellow-500 transition">البائعون</a>
+                    <a href="#" class="hover:text-yellow-500 transition">الدعم</a>
+                </nav>
+
+                <!-- زر القائمة المحمولة -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-full hover:bg-tertiary transition">
+                    <i class="fas fa-bars text-secondary"></i>
+                </button>
+
+                <!-- الأيقونات -->
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <!-- زر تبديل الوضع -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-tertiary transition">
+                        <i id="theme-icon" class="fas fa-moon text-secondary"></i>
+                    </button>
+                    
+                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-bell text-secondary"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-heart text-secondary"></i>
+                    </button>
+                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-shopping-cart text-secondary"></i>
+                        <span class="absolute top-0 right-0 w-4 h-4 bg-yellow-500 text-black text-xs rounded-full flex items-center justify-center">3</span>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-tertiary transition">
+                        <i class="fas fa-user text-secondary"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- القائمة المحمولة -->
+            <div id="mobile-menu" class="md:hidden bg-secondary border-t border-color hidden">
+                <div class="container mx-auto px-4 py-4">
+                    <nav class="flex flex-col space-y-4">
+                        <a href="#" class="hover:text-yellow-500 transition">المزادات</a>
+                        <a href="#" class="hover:text-yellow-500 transition">المتجر</a>
+                        <a href="#" class="hover:text-yellow-500 transition">البائعون</a>
+                        <a href="#" class="hover:text-yellow-500 transition">الدعم</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- السلايدر الرئيسي -->
+    <section class="relative h-64 md:h-96 overflow-hidden bg-tertiary parallax">
+        <div class="particles-container" id="particles-container"></div>
+        
+        <div class="absolute inset-0 bg-black bg-opacity-20 z-10"></div>
+        
+        <div class="relative z-20 h-full flex items-center">
+            <div class="container mx-auto px-4">
+                <div class="max-w-2xl">
+                    <h1 class="text-3xl md:text-5xl font-bold mb-4 gold-text">اكتشف عالم الأحجار النادرة</h1>
+                    <p class="text-lg md:text-xl mb-8 text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
+                        <button class="gold-gradient text-white font-bold py-3 px-6 rounded-full ripple shine-effect">
+                            استكشف الآن
+                        </button>
+                        <button class="bg-transparent border-2 border-yellow-500 text-yellow-500 font-bold py-3 px-6 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                            تصفح المزادات
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- المنتجات المميزة -->
+    <section class="py-16 fade-in">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-3xl font-bold gold-text">منتجات مميزة</h2>
+                <a href="#" class="text-yellow-500 hover:text-yellow-400 flex items-center">
+                    مشاهدة الكل
+                    <i class="fas fa-arrow-left mr-2"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- بطاقة منتج 1 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
+                    <div class="certification-seal">
+                        <i class="fas fa-award text-white"></i>
+                    </div>
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/ياقوت أزرق نادر.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
+                            موثق
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">ياقوت أزرق نادر</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">18,500 ر.س</span>
+                            <span class="text-secondary text-sm">سريلانكا</span>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 95%"></div>
+                            </div>
+                            <span class="text-xs text-secondary mr-2">95%</span>
+                        </div>
+                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
+                            عرض التفاصيل
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- بطاقة منتج 2 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
+                    <div class="certification-seal">
+                        <i class="fas fa-award text-white"></i>
+                    </div>
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/زمرد كولومبي نقي.jpg" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
+                            موثق
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">زمرد كولومبي نقي</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">22,750 ر.س</span>
+                            <span class="text-secondary text-sm">كولومبيا</span>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 92%"></div>
+                            </div>
+                            <span class="text-xs text-secondary mr-2">92%</span>
+                        </div>
+                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
+                            عرض التفاصيل
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- بطاقة منتج 3 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
+                    <div class="certification-seal">
+                        <i class="fas fa-award text-white"></i>
+                    </div>
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/ألماس وردي نادر.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
+                            موثق
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">ألماس وردي نادر</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">125,000 ر.س</span>
+                            <span class="text-secondary text-sm">جنوب أفريقيا</span>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 98%"></div>
+                            </div>
+                            <span class="text-xs text-secondary mr-2">98%</span>
+                        </div>
+                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
+                            عرض التفاصيل
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- بطاقة منتج 4 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover relative border border-color">
+                    <div class="certification-seal">
+                        <i class="fas fa-award text-white"></i>
+                    </div>
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/ياقوت وردي من ميانمار.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-yellow-500 text-black text-xs font-bold py-1 px-2 rounded">
+                            موثق
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">ياقوت وردي من ميانمار</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">15,300 ر.س</span>
+                            <span class="text-secondary text-sm">ميانمار</span>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                            <span class="text-xs text-secondary mr-2">90%</span>
+                        </div>
+                        <button class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
+                            عرض التفاصيل
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- المزادات الجارية -->
+    <section class="py-16 bg-tertiary fade-in">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-3xl font-bold gold-text">المزادات الجارية</h2>
+                <a href="#" class="text-yellow-500 hover:text-yellow-400 flex items-center">
+                    مشاهدة الكل
+                    <i class="fas fa-arrow-left mr-2"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- مزاد 1 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover pulse-glow border border-color">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/عقيق نادر من اليمن.jpeg" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded">
+                            ينتهي قريبًا
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">عقيق نادر من اليمن</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">8,500 ر.س</span>
+                            <span class="text-secondary text-sm">اليمن</span>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>الوقت المتبقي</span>
+                                <span class="countdown-flash">05:12:34</span>
+                            </div>
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">12 مزايد</span>
+                            <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple">
+                                زايد الآن
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- مزاد 2 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/توباز أزرق برازيلي.png" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
+                            نشط
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">توباز أزرق برازيلي</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">12,300 ر.س</span>
+                            <span class="text-secondary text-sm">البرازيل</span>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>الوقت المتبقي</span>
+                                <span>2 يوم 04:22:15</span>
+                            </div>
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">7 مزايدين</span>
+                            <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple">
+                                زايد الآن
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- مزاد 3 -->
+                <div class="bg-secondary rounded-xl overflow-hidden card-hover border border-color">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="./bidding/imges/عقيق ناري استرالي.jpg" alt="حجر كريم" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold py-1 px-2 rounded">
+                            نشط
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-2">عقيق ناري استرالي</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-yellow-500 font-bold">9,800 ر.س</span>
+                            <span class="text-secondary text-sm">أستراليا</span>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>الوقت المتبقي</span>
+                                <span>1 يوم 12:45:22</span>
+                            </div>
+                            <div class="w-full bg-tertiary rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">9 مزايدين</span>
+                            <button class="gold-gradient text-white font-bold py-2 px-4 rounded-lg ripple">
+                                زايد الآن
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الموردين الموثوقين -->
+    <section class="py-16 fade-in">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center gold-text mb-12">الموردين الموثوقين</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- مورد 1 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="مورد" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold">أحمد الجواهري</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- مورد 2 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="مورد" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold">محمد الأحمدي</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- مورد 3 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="مورد" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold">خالد البلوي</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- مورد 4 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="مورد" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold">سعيد القحطاني</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- مورد 5 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="مورد" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold">فهد الشمري</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+                
+                <!-- مورد 6 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="مورد" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold">نورة السديري</h3>
+                    <div class="flex text-yellow-500 text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer class="bg-secondary py-12 border-t border-color">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center">
+                            <i class="fas fa-gem text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold mr-3 gold-text">جوهرة</h2>
+                    </div>
+                    <p class="text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة في العالم العربي.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4 gold-text">روابط سريعة</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">المزادات النشطة</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">البائعون الموثوقون</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">كيفية المشاركة</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">الشروط والأحكام</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4 gold-text">الدعم</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">الأسئلة الشائعة</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">اتصل بنا</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">الشكاوى والاقتراحات</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">مركز المساعدة</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4 gold-text">طرق الدفع</h3>
+                    <div class="flex space-x-2 rtl:space-x-reverse mb-4">
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fab fa-cc-visa text-2xl text-blue-500"></i>
+                        </div>
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fab fa-cc-mastercard text-2xl text-red-500"></i>
+                        </div>
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fab fa-cc-paypal text-2xl text-blue-400"></i>
+                        </div>
+                        <div class="bg-tertiary p-2 rounded">
+                            <i class="fas fa-university text-2xl text-yellow-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-secondary text-sm">جميع المعاملات محمية ومشفرة</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-color mt-8 pt-8 text-center">
+                <p class="text-secondary gold-text">© 2023 جوهرة. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // التحكم في الوضع النهاري والليلي
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        // التحقق من تفضيلات النظام والمستخدم
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        function getUserPreference() {
+            return localStorage.getItem('theme');
+        }
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        
+        // تهيئة الوضع الأولي
+        function initTheme() {
+            const userPreference = getUserPreference();
+            if (userPreference) {
+                setTheme(userPreference);
+            } else {
+                const systemTheme = getSystemTheme();
+                setTheme(systemTheme);
+            }
+        }
+        
+        // تبديل الوضع
+        function toggleTheme() {
+            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // الاستماع لتغيرات نظام التشغيل
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!getUserPreference()) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+        
+        // إضافة المستمعين للأحداث
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // تبديل القائمة المحمولة
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // تأثير البارالاكس
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.parallax');
+            parallaxElements.forEach(el => {
+                const rate = scrolled * -0.5;
+                el.style.transform = `translateY(${rate}px)`;
+            });
+        });
+
+        // مراقبة الظهور للتأثيرات
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        const fadeInElements = document.querySelectorAll('.fade-in');
+        fadeInElements.forEach(el => observer.observe(el));
+        
+        // تأثير الجسيمات الذهبية
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // حجم عشوائي
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // موضع عشوائي
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // شفافية عشوائية
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                // إضافة الحركة
+                const duration = Math.random() * 20 + 10;
+                particle.style.animation = `float ${duration}s linear infinite`;
+                
+                // إنشاء حركة عائمة
+                const keyframes = `
+                @keyframes float {
+                    0% {
+                        transform: translate(0, 0) rotate(0deg);
+                    }
+                    25% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(90deg);
+                    }
+                    50% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(180deg);
+                    }
+                    75% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(270deg);
+                    }
+                    100% {
+                        transform: translate(0, 0) rotate(360deg);
+                    }
+                }
+                `;
+                
+                const styleSheet = document.createElement('style');
+                styleSheet.textContent = keyframes;
+                document.head.appendChild(styleSheet);
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // تهيئة تأثير الجسيمات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            createParticles();
+            
+            // تأثيرات الريبل للأزرار
+            const rippleButtons = document.querySelectorAll('.ripple');
+            rippleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // إضافة صوت نقرة معدنية
+                    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
+                    audio.volume = 0.3;
+                    audio.play().catch(() => {});
+                });
+            });
+            
+            // عدادات تنازلية للمزادات
+            function updateCountdowns() {
+                const countdownElements = document.querySelectorAll('.countdown-flash');
+                countdownElements.forEach(element => {
+                    // في التطبيق الحقيقي، سيكون هناك حساب الوقت المتبقي الحقيقي
+                    // هنا نستخدم قيمة عشوائية للعرض فقط
+                    const hours = Math.floor(Math.random() * 6);
+                    const minutes = Math.floor(Math.random() * 60);
+                    const seconds = Math.floor(Math.random() * 60);
+                    
+                    element.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                });
+            }
+            
+            // تحديث العدادات كل ثانية
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+
+            // زر العودة لأعلى
+            const backToTopButton = document.createElement('button');
+            backToTopButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            backToTopButton.className = 'fixed bottom-4 right-4 bg-yellow-500 text-black p-3 rounded-full shadow-lg hover:bg-yellow-600 transition opacity-0 pointer-events-none z-50';
+            backToTopButton.id = 'back-to-top';
+            document.body.appendChild(backToTopButton);
+
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'pointer-events-none');
+                    backToTopButton.classList.add('opacity-100', 'pointer-events-auto');
+                } else {
+                    backToTopButton.classList.remove('opacity-100', 'pointer-events-auto');
+                    backToTopButton.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
