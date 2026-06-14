@@ -250,10 +250,10 @@ class SellerController extends Controller
                 'first_name' => 'sometimes|string|max:255',
                 'last_name' => 'sometimes|string|max:255',
                 'email' => 'sometimes|email|unique:users,email,' . $request->user()->id,
-                'phone' => 'sometimes|string|max:20',
-                'address' => 'sometimes|string',
-                'city' => 'sometimes|string|max:255',
-                'country' => 'sometimes|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string',
+                'city' => 'nullable|string|max:255',
+                'country' => 'nullable|string|max:255',
             ]);
 
             $user = $request->user();

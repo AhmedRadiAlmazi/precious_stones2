@@ -176,6 +176,19 @@
         
         dashboardContainer.insertAdjacentHTML('afterbegin', sidebarHTML);
 
+        // Update pending sellers badge for admin
+        if (role === 'admin' && typeof api !== 'undefined' && api.request) {
+            api.request('/admin/stats').then(res => {
+                if (res && res.success && res.data) {
+                    const badge = document.getElementById('pending-badge');
+                    if (badge) {
+                        badge.textContent = res.data.pending_sellers || 0;
+                        badge.style.display = res.data.pending_sellers > 0 ? 'inline-block' : 'none';
+                    }
+                }
+            }).catch(err => console.warn('Failed to load admin stats for badge:', err));
+        }
+
         // 6. Re-Initialize Theme Buttons if they were injected
         // theme.js runs on DOMContentLoaded usually. Since we are also likely in DOMContentLoaded, 
         // we might run AFTER theme.js. So we need to manually trigger icon update or re-attach listeners.

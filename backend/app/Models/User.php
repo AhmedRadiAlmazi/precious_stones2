@@ -27,9 +27,9 @@ class User extends Authenticatable
         'password',
         'account_type',
         'is_approved',
-        'is_approved',
         'is_active',
         'avatar',
+        'wallet_balance',
     ];
 
     /**
@@ -53,9 +53,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
-            'password' => 'hashed',
             'is_approved' => 'boolean',
             'is_active' => 'boolean',
+            'wallet_balance' => 'float',
         ];
     }
 

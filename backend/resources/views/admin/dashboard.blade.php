@@ -425,7 +425,7 @@
     }
 
     async function approveAuction(auctionId) {
-        if (!confirm('هل أنت متأكد من الموافقة على هذا المزاد؟')) return;
+        if (!await ui.confirm('هل أنت متأكد من الموافقة على هذا المزاد؟', 'تأكيد المزاد')) return;
         try {
             await api.approveAuction(auctionId);
             ui.showSuccess('تمت الموافقة على المزاد بنجاح!');
@@ -436,7 +436,7 @@
     }
 
     async function rejectAuction(auctionId) {
-        if (!confirm('هل أنت متأكد من رفض هذا المزاد؟')) return;
+        if (!await ui.confirm('هل أنت متأكد من رفض هذا المزاد؟', 'رفض المزاد')) return;
         try {
             await api.rejectAuction(auctionId);
             ui.showSuccess('تم رفض المزاد');
@@ -447,7 +447,7 @@
     }
 
     async function approveSeller(userId) {
-        if (!confirm('هل أنت متأكد من الموافقة على هذا البائع؟')) return;
+        if (!await ui.confirm('هل أنت متأكد من الموافقة على هذا البائع؟', 'موافقة بائع')) return;
         try {
             await api.approveSeller(userId);
             ui.showSuccess('تم الموافقة على البائع بنجاح!');
@@ -458,7 +458,7 @@
     }
 
     async function rejectSeller(userId) {
-        if (!confirm('هل أنت متأكد من رفض هذا البائع؟')) return;
+        if (!await ui.confirm('هل أنت متأكد من رفض هذا البائع؟', 'رفض بائع')) return;
         try {
             await api.rejectSeller(userId);
             ui.showSuccess('تم رفض البائع');

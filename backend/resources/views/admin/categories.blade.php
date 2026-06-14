@@ -257,7 +257,8 @@
     }
 
     async function deleteCategory(id) {
-        if (!confirm('هل أنت متأكد من حذف هذه الفئة؟\n\nملاحظة: لا يمكن حذف الفئات التي تحتوي على منتجات.')) return;
+        const approved = await ui.confirm('هل أنت متأكد من حذف هذه الفئة؟\n\nملاحظة: لا يمكن حذف الفئات التي تحتوي على منتجات.', 'تأكيد حذف الفئة');
+        if (!approved) return;
         try {
             await api.deleteCategory(id);
             ui.showSuccess('تم حذف الفئة بنجاح!');

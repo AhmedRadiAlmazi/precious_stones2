@@ -90,6 +90,11 @@
                         <i class="fas fa-shopping-cart text-secondary"></i>
                     </button>
                     
+                    <div id="user-wallet-container" class="hidden items-center bg-tertiary border border-color rounded-full px-3 py-1.5 gap-2 text-xs font-bold text-yellow-500">
+                        <i class="fas fa-wallet"></i>
+                        <span id="header-wallet-balance">0</span><span class="mr-0.5">ر.س</span>
+                    </div>
+
                     <div id="auth-buttons-container" class="flex items-center">
                         <a href="{{ url('/login') }}" class="text-secondary hover:text-yellow-500 transition text-sm font-semibold">تسجيل الدخول</a>
                     </div>
@@ -157,8 +162,58 @@
         </div>
     </footer>
 
+    <!-- نافذة الشهادة الفاخرة للتحقق من الأحجار -->
+    <div id="cert-verification-modal" class="cert-modal-backdrop" onclick="closeCertModal()">
+        <div class="cert-container text-right" onclick="event.stopPropagation()">
+            <span class="cert-close" onclick="closeCertModal()">&times;</span>
+            <div class="cert-header">
+                <h2 class="cert-title">شهادة فحص وتوثيق حجر كريم</h2>
+                <p class="cert-subtitle">Certificate of Authenticity & Gemological Report</p>
+            </div>
+            <div class="cert-body">
+                <div class="cert-row">
+                    <span class="cert-label">رقم الشهادة الموثق</span>
+                    <span class="cert-value text-yellow-500 font-mono" id="cert-number">#GIA-9837482</span>
+                </div>
+                <div class="cert-row">
+                    <span class="cert-label">نوع الحجر الكريم</span>
+                    <span class="cert-value" id="cert-stone-name">ياقوت أحمر طبيعي (Ruby)</span>
+                </div>
+                <div class="cert-row">
+                    <span class="cert-label">الوزن بالقيراط</span>
+                    <span class="cert-value" id="cert-weight">4.25 قيراط (Carats)</span>
+                </div>
+                <div class="cert-row">
+                    <span class="cert-label">درجة النقاء والوضوح</span>
+                    <span class="cert-value" id="cert-clarity">VVS1 - نقي جداً</span>
+                </div>
+                <div class="cert-row">
+                    <span class="cert-label">القطع والشكل</span>
+                    <span class="cert-value" id="cert-cut">قطع وسادة بيضاوي (Oval Cushion)</span>
+                </div>
+                <div class="cert-row">
+                    <span class="cert-label">المنشأ / المصدر</span>
+                    <span class="cert-value text-yellow-500" id="cert-origin">سريلانكا (Ceylon)</span>
+                </div>
+                <div class="cert-row">
+                    <span class="cert-label">حالة التوثيق</span>
+                    <span class="cert-value text-green-500" id="cert-status"><i class="fas fa-check-circle ml-1"></i>نشط وموثق</span>
+                </div>
+            </div>
+            <div class="cert-footer">
+                <div class="cert-seal-gold">
+                    جوهرة<br>ضمان 100%
+                </div>
+                <div class="cert-qr-container">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://jawharah.luxury/verify/GIA-9837482" alt="QR Verify" class="w-full h-full">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- تحميل ملف الـ API والتحقق من التوكن وتوجيه الأزرار -->
     <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // تفعيل قائمة الجوال
@@ -170,9 +225,10 @@
                 });
             }
 
-            // فحص المصادقة وعرض زر لوحة التحكم
+            // فحص المصادقة وعرض زر لوحة التحكم والمحفظة
             if (typeof api !== 'undefined') {
                 const container = document.getElementById('auth-buttons-container');
+                const walletContainer = document.getElementById('user-wallet-container');
                 if (api.isAuthenticated()) {
                     const user = api.getUser();
                     let dashboardLink = '{{ url("/seller/dashboard") }}';
@@ -184,9 +240,74 @@
                             <i class="fas fa-tachometer-alt ml-1"></i>لوحة التحكم
                         </a>
                     `;
+
+                    // Show wallet and load simulated balance
+                    if (walletContainer) {
+                        walletContainer.classList.remove('hidden');
+                        walletContainer.classList.add('flex');
+                        if (typeof api.getUserWallet === 'function') {
+                            const wallet = api.getUserWallet();
+                            document.getElementById('header-wallet-balance').textContent = parseFloat(wallet.balance).toLocaleString();
+                        }
+                    }
+
+                    // Sync user profile and wallet with database
+                    if (typeof api.getMe === 'function') {
+                        api.getMe().then(response => {
+                            if (response.success && response.data) {
+                                const freshUser = response.data;
+                                api.saveUser(freshUser);
+                                
+                                // Sync wallet balance from server
+                                if (typeof freshUser.wallet_balance !== 'undefined' && freshUser.wallet_balance !== null) {
+                                    const wallet = api.getUserWallet();
+                                    wallet.balance = parseFloat(freshUser.wallet_balance);
+                                    api.saveUserWallet(wallet);
+                                }
+                                
+                                // Update dashboard link if roles changed
+                                let newDashboardLink = '{{ url("/seller/dashboard") }}';
+                                if (freshUser.roles && freshUser.roles.some(r => r.name === 'admin')) {
+                                    newDashboardLink = '{{ url("/admin/dashboard") }}';
+                                }
+                                const linkEl = container.querySelector('a');
+                                if (linkEl) {
+                                    linkEl.href = newDashboardLink;
+                                }
+                            }
+                        }).catch(err => console.error('Error syncing profile:', err));
+                    }
                 }
             }
         });
+
+        function showCertModal(stoneName, certNo, weight, clarity, cut, origin) {
+            document.getElementById('cert-stone-name').textContent = stoneName || 'ياقوت أزرق فاخر';
+            document.getElementById('cert-number').textContent = certNo || '#GIA-9837482';
+            document.getElementById('cert-weight').textContent = weight || '3.50 قيراط';
+            document.getElementById('cert-clarity').textContent = clarity || 'VVS1 - نقي جداً';
+            document.getElementById('cert-cut').textContent = cut || 'قطع كوشون ممتاز';
+            document.getElementById('cert-origin').textContent = origin || 'سريلانكا';
+            
+            const qrImg = document.querySelector('.cert-qr-container img');
+            if (qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://jawharah.luxury/verify/${encodeURIComponent(certNo || 'GIA-9837482')}`;
+            }
+
+            const modal = document.getElementById('cert-verification-modal');
+            if (modal) {
+                modal.classList.add('open');
+            }
+        }
+
+        function closeCertModal() {
+            const modal = document.getElementById('cert-verification-modal');
+            if (modal) {
+                modal.classList.remove('open');
+            }
+        }
+        window.showCertModal = showCertModal;
+        window.closeCertModal = closeCertModal;
     </script>
     @yield('scripts')
 </body>

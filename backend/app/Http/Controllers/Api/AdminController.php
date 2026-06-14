@@ -586,4 +586,119 @@ class AdminController extends Controller
             'data' => $orders,
         ]);
     }
+
+    /**
+     * Update user details (Admin only)
+     */
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'first_name' => 'sometimes|required|string|max:255',
+            'last_name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
+            'phone' => 'sometimes|required|string|max:20|unique:users,phone,' . $id,
+            'role' => 'sometimes|required|in:admin,seller,buyer',
+            'wallet_balance' => 'sometimes|required|numeric|min:0',
+            'is_active' => 'sometimes|required|boolean',
+        ]);
+
+        // Prevent admin from disabling themselves or demoting themselves
+        if ($user->id === auth()->id()) {
+            if (isset($validated['is_active']) && !$validated['is_active']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكنك تعطيل حسابك الخاص.',
+                ], 422);
+            }
+            if (isset($validated['role']) && $validated['role'] !== 'admin') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكنك تغيير دورك الخاص.',
+                ], 422);
+            }
+        }
+
+        // Update basic info
+        $user->fill($request->only(['first_name', 'last_name', 'email', 'phone', 'wallet_balance', 'is_active']));
+
+        // Handle role syncing and account_type
+        if ($request->has('role')) {
+            $roleName = $request->role;
+            if ($roleName === 'admin') {
+                $user->syncRoles(['admin']);
+            } elseif ($roleName === 'seller') {
+                $user->account_type = 'seller';
+                $user->is_approved = true; // Auto approve when admin changes to seller
+                $user->syncRoles(['seller']);
+            } else {
+                $user->account_type = 'buyer';
+                $user->syncRoles(['buyer']);
+            }
+        }
+
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تحديث بيانات المستخدم بنجاح!',
+            'data' => $user->load('roles'),
+        ]);
+    }
+
+    /**
+     * Delete user account (Admin only)
+     */
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكنك حذف حسابك الخاص.',
+            ], 422);
+        }
+
+        // Check if user has active auctions or pending orders
+        $hasActiveAuctions = \App\Models\Auction::where('seller_id', $id)
+            ->whereIn('status', ['pending', 'active'])
+            ->exists();
+
+        if ($hasActiveAuctions) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن حذف المستخدم لوجود مزادات نشطة أو معلقة مرتبطة بحسابه.',
+            ], 422);
+        }
+
+        $user->syncRoles([]);
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حذف حساب المستخدم بنجاح!',
+        ]);
+    }
+
+    /**
+     * Update order status (Admin only)
+     */
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $order = \App\Models\Order::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تحديث حالة الطلب بنجاح!',
+            'data' => $order->load(['product', 'buyer', 'seller']),
+        ]);
+    }
 }

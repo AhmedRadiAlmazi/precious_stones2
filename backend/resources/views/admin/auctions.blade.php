@@ -52,12 +52,72 @@
         <!-- Pagination buttons will be inserted here -->
     </div>
 </div>
+
+<!-- Edit Auction Modal -->
+<div id="auction-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-secondary rounded-xl shadow-2xl max-w-md w-full mx-4 border border-color">
+        <div class="p-6 border-b border-color flex justify-between items-center">
+            <h2 class="text-xl font-bold text-primary" id="auction-modal-title">تعديل بيانات المزاد</h2>
+            <button onclick="closeAuctionModal()" class="text-secondary hover:text-primary">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <form id="auction-form" class="p-6 space-y-4">
+            <input type="hidden" id="auction-id">
+            
+            <div>
+                <label class="block text-xs font-semibold text-primary mb-1">السعر الابتدائي (ر.س) *</label>
+                <input type="number" id="auction-starting-price" required min="0" step="0.01"
+                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-primary mb-1">الحد الأدنى للزيادة (ر.س) *</label>
+                <input type="number" id="auction-increment" required min="0" step="0.01"
+                    class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-primary mb-1">وقت البدء *</label>
+                    <input type="datetime-local" id="auction-start-time" required
+                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-primary mb-1">وقت الانتهاء *</label>
+                    <input type="datetime-local" id="auction-end-time" required
+                        class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-primary mb-1">حالة المزاد *</label>
+                <select id="auction-status" required class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm">
+                    <option value="pending">في الانتظار (Pending)</option>
+                    <option value="active">نشط (Active)</option>
+                    <option value="ended">منتهي (Ended)</option>
+                    <option value="cancelled">ملغي (Cancelled)</option>
+                </select>
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-color mt-6">
+                <button type="submit" class="flex-1 bg-gold hover:bg-yellow-600 text-black py-2.5 rounded-lg font-bold transition">
+                    <i class="fas fa-save ml-1"></i>حفظ التعديلات
+                </button>
+                <button type="button" onclick="closeAuctionModal()" class="flex-1 bg-tertiary text-primary py-2.5 rounded-lg font-semibold hover:bg-opacity-80 transition border border-color">
+                    إلغاء
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
     let currentPage = 1;
     let totalPages = 1;
+    window.allAuctions = [];
 
     // Load auctions
     async function loadAuctions(page = 1) {
@@ -71,7 +131,9 @@
             if (statusValue) params.status = statusValue;
 
             const response = await api.getAdminAuctions(params);
-            displayAuctions(response.data || response);
+            const data = response.data || response;
+            window.allAuctions = data.data || [];
+            displayAuctions(data);
         } catch (error) {
             console.error('Error loading auctions:', error);
             ui.showError('فشل تحميل المزادات');
@@ -121,8 +183,8 @@
 
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="bg-tertiary rounded-lg p-3">
-                            <p class="text-xs text-secondary mb-1">السعر الحالي</p>
-                            <p class="text-lg font-bold text-green-500">${auction.current_price} ر.س</p>
+                            <p class="text-xs text-secondary mb-1">السعر الابتدائي / الحالي</p>
+                            <p class="text-lg font-bold text-green-500">${auction.starting_price} / ${auction.current_price} ر.س</p>
                         </div>
                         <div class="bg-tertiary rounded-lg p-3">
                             <p class="text-xs text-secondary mb-1">عدد المزايدات</p>
@@ -148,6 +210,12 @@
                     </div>
 
                     <div class="flex gap-2 pt-4 border-t border-color">
+                        <button onclick="editAuction(${auction.id})" 
+                            class="px-4 py-2 rounded-lg bg-blue-500 bg-opacity-25 hover:bg-opacity-35 text-blue-500 transition text-sm font-semibold"
+                            title="تعديل">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+
                         ${auction.status === 'pending' ? `
                             <button onclick="approveAuction(${auction.id})" 
                                 class="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition text-sm font-semibold">
@@ -163,6 +231,7 @@
                                 <i class="fas fa-stop ml-1"></i>إنهاء المزاد
                             </button>
                         ` : ''}
+                        
                         ${auction.status === 'pending' || auction.status === 'cancelled' ? `
                             <button onclick="deleteAuction(${auction.id})" 
                                 class="px-4 py-2 rounded-lg bg-red-500 bg-opacity-25 hover:bg-opacity-35 text-red-500 transition text-sm font-semibold"
@@ -225,8 +294,65 @@
         }
     }
 
+    function formatDateTimeLocal(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const tzOffset = date.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(date.getTime() - tzOffset)).toISOString().slice(0, 16);
+        return localISOTime;
+    }
+
+    function editAuction(id) {
+        const auction = window.allAuctions.find(a => a.id === id);
+        if (!auction) return;
+
+        document.getElementById('auction-id').value = auction.id;
+        document.getElementById('auction-starting-price').value = auction.starting_price || 0;
+        document.getElementById('auction-increment').value = auction.min_bid_increment || 0;
+        document.getElementById('auction-start-time').value = formatDateTimeLocal(auction.start_time);
+        document.getElementById('auction-end-time').value = formatDateTimeLocal(auction.end_time);
+        document.getElementById('auction-status').value = auction.status;
+
+        const modal = document.getElementById('auction-modal');
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+    }
+
+    function closeAuctionModal() {
+        const modal = document.getElementById('auction-modal');
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
+
+    document.getElementById('auction-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('auction-id').value;
+        const data = {
+            starting_price: parseFloat(document.getElementById('auction-starting-price').value),
+            min_bid_increment: parseFloat(document.getElementById('auction-increment').value),
+            start_time: document.getElementById('auction-start-time').value.replace('T', ' ') + ':00',
+            end_time: document.getElementById('auction-end-time').value.replace('T', ' ') + ':00',
+            status: document.getElementById('auction-status').value
+        };
+
+        try {
+            const response = await api.updateAdminAuction(id, data);
+            if (response.success) {
+                ui.showSuccess('تم تحديث بيانات المزاد بنجاح!');
+                closeAuctionModal();
+                loadAuctions(currentPage);
+            } else {
+                ui.showError(response.message || 'فشل التحديث');
+            }
+        } catch (error) {
+            console.error(error);
+            ui.showError(error.message || 'حدث خطأ أثناء حفظ التعديلات');
+        }
+    });
+
     async function approveAuction(id) {
-        if (!confirm('هل أنت متأكد من الموافقة على هذا المزاد؟')) return;
+        const approved = await ui.confirm('هل أنت متأكد من الموافقة على هذا المزاد؟', 'موافقة على المزاد');
+        if (!approved) return;
         try {
             await api.approveAuction(id);
             ui.showSuccess('تمت الموافقة على المزاد بنجاح!');
@@ -238,7 +364,8 @@
     }
 
     async function rejectAuction(id) {
-        if (!confirm('هل أنت متأكد من رفض هذا المزاد؟')) return;
+        const approved = await ui.confirm('هل أنت متأكد من رفض هذا المزاد؟', 'رفض المزاد');
+        if (!approved) return;
         try {
             await api.rejectAuction(id);
             ui.showSuccess('تم رفض المزاد');
@@ -250,7 +377,8 @@
     }
 
     async function endAuction(id) {
-        if (!confirm('هل أنت متأكد من إنهاء هذا المزاد؟\n\nسيتم إنهاء المزاد فوراً وتحديد الفائز.')) return;
+        const approved = await ui.confirm('هل أنت متأكد من إنهاء هذا المزاد؟\n\nسيتم إنهاء المزاد فوراً وتحديد الفائز.', 'إنهاء المزاد فوراً');
+        if (!approved) return;
         try {
             await api.endAuction(id);
             ui.showSuccess('تم إنهاء المزاد بنجاح!');
@@ -262,7 +390,8 @@
     }
 
     async function deleteAuction(id) {
-        if (!confirm('هل أنت متأكد من حذف هذا المزاد؟')) return;
+        const approved = await ui.confirm('هل أنت متأكد من حذف هذا المزاد؟', 'تأكيد حذف المزاد');
+        if (!approved) return;
         try {
             await api.deleteAdminAuction(id);
             ui.showSuccess('تم حذف المزاد بنجاح!');

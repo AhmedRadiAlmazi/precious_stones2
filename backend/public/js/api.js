@@ -215,6 +215,63 @@ const api = {
         return await this.request('/my-bids');
     },
 
+    // Wallet APIs (Simulated locally via localStorage)
+    getUserWallet() {
+        const user = this.getUser();
+        if (!user) return { balance: 0, locked: 0 };
+        const key = `jawharah_wallet_${user.id}`;
+        let wallet = localStorage.getItem(key);
+        if (!wallet) {
+            wallet = { balance: 100000, locked: 0 }; // Start with 100,000 SAR
+            localStorage.setItem(key, JSON.stringify(wallet));
+        } else {
+            wallet = JSON.parse(wallet);
+        }
+        return wallet;
+    },
+
+    saveUserWallet(wallet) {
+        const user = this.getUser();
+        if (!user) return;
+        const key = `jawharah_wallet_${user.id}`;
+        localStorage.setItem(key, JSON.stringify(wallet));
+        // Update header UI if present
+        const balanceEl = document.getElementById('header-wallet-balance');
+        if (balanceEl) {
+            balanceEl.textContent = parseFloat(wallet.balance).toLocaleString();
+        }
+    },
+
+    lockBidDeposit(amount) {
+        const wallet = this.getUserWallet();
+        if (wallet.balance < amount) {
+            throw new Error('رصيد المحفظة غير كافٍ لتأمين المزايدة (المطلوب 5% من قيمة المزايدة).');
+        }
+        wallet.balance -= amount;
+        wallet.locked += amount;
+        this.saveUserWallet(wallet);
+        return true;
+    },
+
+    releaseBidDeposit(amount) {
+        const wallet = this.getUserWallet();
+        wallet.locked = Math.max(0, wallet.locked - amount);
+        wallet.balance += amount;
+        this.saveUserWallet(wallet);
+    },
+
+    confirmBidPayment(amount, depositAmount) {
+        const wallet = this.getUserWallet();
+        wallet.locked = Math.max(0, wallet.locked - depositAmount);
+        // deduct remaining amount from balance
+        const remaining = amount - depositAmount;
+        if (wallet.balance < remaining) {
+            throw new Error('رصيد المحفظة غير كافٍ لإتمام دفع المزاد.');
+        }
+        wallet.balance -= remaining;
+        this.saveUserWallet(wallet);
+    },
+
     async getAuctionBids(auctionId) {
         return await this.request(`/auctions/${auctionId}/bids`);
     },
@@ -223,6 +280,26 @@ const api = {
     async getAllUsers(params = {}) {
         const queryString = new URLSearchParams(params).toString();
         return await this.request(`/admin/users${queryString ? '?' + queryString : ''}`);
+    },
+
+    async updateAdminUser(id, data) {
+        return await this.request(`/admin/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    },
+
+    async deleteAdminUser(id) {
+        return await this.request(`/admin/users/${id}`, {
+            method: 'DELETE',
+        });
+    },
+
+    async updateAdminOrderStatus(id, status) {
+        return await this.request(`/admin/orders/${id}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ status }),
+        });
     },
 
     async getPendingSellers() {

@@ -69,6 +69,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
         // User Management
         Route::get('/users', [\App\Http\Controllers\Api\AdminController::class, 'getAllUsers']);
+        Route::put('/users/{id}', [\App\Http\Controllers\Api\AdminController::class, 'updateUser']);
+        Route::delete('/users/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteUser']);
         Route::post('/users/{id}/toggle-status', [\App\Http\Controllers\Api\AdminController::class, 'toggleUserStatus']);
         Route::get('/sellers/pending', [\App\Http\Controllers\Api\AdminController::class, 'getPendingSellers']);
         Route::post('/sellers/{id}/approve', [\App\Http\Controllers\Api\AdminController::class, 'approveSeller']);
@@ -90,6 +92,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::delete('/products/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteProduct']);
         Route::post('/products/{id}/toggle-status', [\App\Http\Controllers\Api\AdminController::class, 'toggleProductStatus']);
         Route::get('/orders', [\App\Http\Controllers\Api\AdminController::class, 'getAllOrders']);
+        Route::put('/orders/{id}/status', [\App\Http\Controllers\Api\AdminController::class, 'updateOrderStatus']);
 
         // Category Management
         Route::get('/categories', [\App\Http\Controllers\Api\AdminController::class, 'getAllCategories']);

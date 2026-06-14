@@ -5,20 +5,20 @@
 
 let currentCategoryId = '';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // If api.js is loaded, we can use it, otherwise we might need standalone logic.
-    // Ideally we should include api.js in theshop.html.
-    // For now, let's just make fetchProducts use a locally scoped or checked base url.
+function initShop() {
     fetchProducts();
     setupCategoryFilters();
     setupSidebarFilters();
-});
-
-// Check if API_BASE_URL is defined, if not define it.
-// Use var or check window to avoid const redeclaration error if script is double loaded
-if (typeof API_BASE_URL === 'undefined') {
-    var API_BASE_URL = 'http://127.0.0.1:8800/api/v1';
 }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initShop);
+} else {
+    initShop();
+}
+
+// Use a local variable to reference the global API_BASE_URL or fallback
+const apiBase = (typeof API_BASE_URL !== 'undefined') ? API_BASE_URL : '/api/v1';
 
 async function fetchProducts() {
     const productsGrid = document.getElementById('products-grid');
@@ -33,7 +33,7 @@ async function fetchProducts() {
 
     if (productId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/products/${productId}`);
+            const response = await fetch(`${apiBase}/products/${productId}`);
             if (!response.ok) throw new Error('Failed to fetch product');
 
             const data = await response.json();
@@ -57,7 +57,7 @@ async function fetchProducts() {
         }
     } else {
         try {
-            let url = `${API_BASE_URL}/products?active=1`;
+            let url = `${apiBase}/products?active=1`;
             if (currentCategoryId) {
                 url += `&category_id=${currentCategoryId}`;
             }
@@ -121,12 +121,12 @@ function renderProducts(products) {
             if (imgPath.startsWith('http')) {
                 imageUrl = imgPath;
             } else if (imgPath.startsWith('/imges') || imgPath.startsWith('imges')) {
-                const serverBase = API_BASE_URL.replace('/api/v1', '');
+                const serverBase = apiBase.replace('/api/v1', '');
                 imageUrl = `${serverBase}/${imgPath.replace(/^\//, '')}`;
             } else {
                 // Get server base URL (remove /api/v1 from API_BASE_URL)
                 // API_BASE_URL is likely http://127.0.0.1:8800/api/v1
-                const serverBase = API_BASE_URL.replace('/api/v1', '');
+                const serverBase = apiBase.replace('/api/v1', '');
                 
                 // Remove leading slash or 'storage/' to normalize
                 imgPath = imgPath.replace(/^\/|storage\//g, ''); 
@@ -154,7 +154,7 @@ function renderProducts(products) {
                     </button>
                 </div>
                 ${product.certification ? `
-                <div class="certification-seal">
+                <div class="certification-seal cursor-pointer hover:scale-105 transition" onclick="showCertModal('${product.name.replace(/'/g, "\\'")}', '#GIA-${product.id}748${product.id}', '${product.weight || '3.20'} قيراط', 'VVS1 - نقي جداً', 'قطع وسادة ممتاز', '${product.origin_country || 'كولومبيا'}')" title="عرض شهادة الحجر">
                     <i class="fas fa-award text-white text-sm"></i>
                 </div>` : ''}
             </div>
@@ -188,17 +188,18 @@ async function requestProduct(productId) {
     
     if (!token) {
         // Using alert for simplicity, ideally use a custom modal or toast
-        alert('يجب عليك تسجيل الدخول أولاً لطلب هذا المنتج.');
+        await ui.alert('يجب عليك تسجيل الدخول أولاً لطلب هذا المنتج.', 'تنبيه تسجيل الدخول');
         window.location.href = '/login'; 
         return;
     }
 
-    if (!confirm('هل أنت متأكد من رغبتك في إرسال طلب شراء لهذا المنتج؟ سيتم إرسال الطلب للبائع.')) {
+    const isConfirmed = await ui.confirm('هل أنت متأكد من رغبتك في إرسال طلب شراء لهذا المنتج؟ سيتم إرسال الطلب للبائع.', 'تأكيد الشراء المباشر');
+    if (!isConfirmed) {
         return;
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/orders`, {
+        const response = await fetch(`${apiBase}/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -215,14 +216,14 @@ async function requestProduct(productId) {
         const data = await response.json();
 
         if (response.ok) {
-            alert('تم إرسال الطلب بنجاح! يمكن للبائع التواصل معك الآن.');
+            await ui.alert('تم إرسال الطلب بنجاح! يمكن للبائع التواصل معك الآن.', 'نجاح العملية');
         } else {
-            alert(data.message || 'حدث خطأ أثناء إرسال الطلب.');
+            await ui.alert(data.message || 'حدث خطأ أثناء إرسال الطلب.', 'خطأ');
         }
 
     } catch (error) {
         console.error('Error placing order:', error);
-        alert('حدث خطأ في الاتصال بالخادم.');
+        await ui.alert('حدث خطأ في الاتصال بالخادم.', 'خطأ الاتصال');
     }
 }
 
@@ -241,10 +242,10 @@ function renderSingleProduct(product) {
         if (imgPath.startsWith('http')) {
             imageUrl = imgPath;
         } else if (imgPath.startsWith('/imges') || imgPath.startsWith('imges')) {
-            const serverBase = API_BASE_URL.replace('/api/v1', '');
+            const serverBase = apiBase.replace('/api/v1', '');
             imageUrl = `${serverBase}/${imgPath.replace(/^\//, '')}`;
         } else {
-            const serverBase = API_BASE_URL.replace('/api/v1', '');
+            const serverBase = apiBase.replace('/api/v1', '');
             imgPath = imgPath.replace(/^\/|storage\//g, ''); 
             imageUrl = `${serverBase}/storage/${imgPath}`;
         }
@@ -265,7 +266,7 @@ function renderSingleProduct(product) {
             <div class="w-full md:w-1/2 h-64 overflow-hidden rounded-xl bg-black relative flex items-center justify-center">
                 <img src="${imageUrl}" alt="${product.name}" class="w-full h-full object-cover">
                 ${product.certification ? `
-                <div class="certification-seal">
+                <div class="certification-seal cursor-pointer hover:scale-105 transition" onclick="showCertModal('${product.name.replace(/'/g, "\\'")}', '#GIA-${product.id}748${product.id}', '${product.weight || '3.20'} قيراط', 'VVS1 - نقي جداً', 'قطع وسادة ممتاز', '${product.origin_country || 'كولومبيا'}')" title="عرض شهادة الحجر">
                     <i class="fas fa-award text-white text-sm"></i>
                 </div>` : ''}
             </div>

@@ -37,6 +37,7 @@
 <body class="theme-transition bg-primary text-primary">
     <!-- ملف الـ API والتحقق المسبق من الصلاحيات -->
     <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
     <script>
         if (!api.isAuthenticated()) {
             window.location.href = '{{ url("/login") }}';

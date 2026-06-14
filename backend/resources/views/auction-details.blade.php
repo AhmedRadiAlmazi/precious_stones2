@@ -67,7 +67,7 @@
                 <!-- الجزء الأيمن: معرض الصور والمؤثرات -->
                 <div class="flex-1">
                     <div class="gallery h-[450px] relative rounded-2xl overflow-hidden border border-color shadow-2xl flex items-center justify-center bg-black">
-                        <div class="certification-seal glow" id="cert-seal">
+                        <div class="certification-seal glow cursor-pointer hover:scale-105 transition" id="cert-seal" title="عرض شهادة توثيق الحجر الكريم">
                             <i class="fas fa-award text-white text-xl"></i>
                         </div>
                         <div class="spotlight"></div>
@@ -302,7 +302,36 @@
                     }
                 }
 
+                // Connect certification seal click
+                const certSeal = document.getElementById('cert-seal');
+                if (certSeal) {
+                    certSeal.onclick = () => {
+                        const name = auction.product?.name || 'حجر كريم فاخر';
+                        const certNo = auction.product?.certification_number || `#GIA-${auction.id}748${auction.id}`;
+                        const weight = `${auction.product?.weight || '3.50'} قيراط`;
+                        const clarity = auction.product?.clarity || 'VVS1 - نقي جداً';
+                        const cut = 'قطع وسادة كوشون ممتاز';
+                        const origin = auction.product?.country || 'سريلانكا';
+                        showCertModal(name, certNo, weight, clarity, cut, origin);
+                    };
+                }
+
                 startCountdown(auction.end_time);
+            }
+
+            function playGavelSound() {
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-gavel-hammer-strike-3103.mp3');
+                audio.volume = 0.4;
+                audio.play().catch(err => console.log('Audio playback block:', err));
+            }
+
+            function triggerPriceGlow() {
+                const priceEl = document.getElementById('current-price');
+                if (priceEl) {
+                    priceEl.classList.remove('pulsate-gold');
+                    void priceEl.offsetWidth; // Trigger reflow to restart animation
+                    priceEl.classList.add('pulsate-gold');
+                }
             }
 
             function startCountdown(endTimeStr) {
@@ -321,7 +350,7 @@
                         document.getElementById('bid-form-container').classList.add('hidden');
                         
                         const winnerText = currentAuction && currentAuction.winner 
-                            ? `الفائز بالمزاد: ${currentAuction.winner.first_name} ${currentAuction.winner.last_name}` 
+                             ? `الفائز بالمزاد: ${currentAuction.winner.first_name} ${currentAuction.winner.last_name}` 
                             : 'انتهى وقت المزاد دون تقديم عروض كافية.';
                         
                         document.getElementById('ended-winner-text').textContent = winnerText;
@@ -375,8 +404,10 @@
                         const dateFormatted = new Date(bid.created_at).toLocaleString('ar-SA');
                         const isWinning = bid.is_winning ? '<span class="bg-green-500 bg-opacity-20 text-green-500 text-xs px-2 py-1 rounded-full font-bold">العرض الأعلى الحالي</span>' : '<span class="text-secondary text-xs">تجاوزه مزايد آخر</span>';
                         
+                        const rowClass = index === 0 ? 'bid-history-item new-bid-row' : 'bid-history-item';
+                        
                         return `
-                            <tr class="bid-history-item">
+                            <tr class="${rowClass}">
                                 <td class="py-4 px-6 text-primary font-semibold flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-gold bg-opacity-10 text-gold flex items-center justify-center text-xs font-bold">
                                         ${index + 1}
@@ -405,7 +436,7 @@
                     e.preventDefault();
 
                     if (!api.isAuthenticated()) {
-                        alert('عذراً، يجب عليك تسجيل الدخول أولاً لتتمكن من تقديم المزايدة.');
+                        await ui.alert('عذراً، يجب عليك تسجيل الدخول أولاً لتتمكن من تقديم المزايدة.', 'تنبيه المصادقة');
                         window.location.href = `{{ url("/login") }}?redirect=${encodeURIComponent(window.location.href)}`;
                         return;
                     }
@@ -416,11 +447,19 @@
                     const incrementVal = parseFloat(currentAuction.bid_increment || 100);
 
                     if (bidAmount < (currentPriceVal + incrementVal)) {
-                        alert(`قيمة المزايدة غير كافية. الحد الأدنى للمزايدة هو ${(currentPriceVal + incrementVal).toLocaleString('ar-SA')} ر.س`);
+                        await ui.alert(`قيمة المزايدة غير كافية. الحد الأدنى للمزايدة هو ${(currentPriceVal + incrementVal).toLocaleString('ar-SA')} ر.س`, 'خطأ في القيمة');
                         return;
                     }
 
-                    if (!confirm(`هل أنت متأكد من تقديم عرض مزايدة بقيمة ${bidAmount.toLocaleString('ar-SA')} ر.س؟`)) {
+                    const depositRequired = Math.round(bidAmount * 0.05);
+                    const wallet = api.getUserWallet();
+                    if (wallet.balance < depositRequired) {
+                        await ui.alert(`رصيد المحفظة غير كافٍ لحجز مبلغ ضمان جدية المزايدة (المطلوب 5% أي: ${depositRequired.toLocaleString('ar-SA')} ر.س، والرصيد المتاح هو ${wallet.balance.toLocaleString('ar-SA')} ر.س).`, 'رصيد غير كافٍ');
+                        return;
+                    }
+
+                    const isConfirmed = await ui.confirm(`هل أنت متأكد من تقديم عرض مزايدة بقيمة ${bidAmount.toLocaleString('ar-SA')} ر.س؟\nسيتم حجز مبلغ ضمان جدية بقيمة ${depositRequired.toLocaleString('ar-SA')} ر.س من محفظتك.`, 'تأكيد تقديم المزايدة');
+                    if (!isConfirmed) {
                         return;
                     }
 
@@ -434,7 +473,20 @@
                         });
 
                         if (response && response.success) {
-                            ui.showSuccess('تم تسجيل عرض المزايدة الخاص بك بنجاح!');
+                            // Lock deposit in wallet
+                            api.lockBidDeposit(depositRequired);
+                            // Update header balance display
+                            const balanceEl = document.getElementById('header-wallet-balance');
+                            if (balanceEl) {
+                                const newWallet = api.getUserWallet();
+                                balanceEl.textContent = parseFloat(newWallet.balance).toLocaleString();
+                            }
+                            
+                            ui.showSuccess('تم تسجيل عرض المزايدة الخاص بك بنجاح وحجز مبلغ الضمان!');
+                            
+                            playGavelSound();
+                            triggerPriceGlow();
+                            
                             await loadAuctionDetails();
                         } else {
                             ui.showError(response.message || 'حدث خطأ أثناء تسجيل المزايدة.');

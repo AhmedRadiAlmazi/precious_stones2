@@ -291,7 +291,7 @@
                                 <div class="absolute top-4 left-4 ${statusColor} text-white text-xs font-bold py-1 px-2 rounded">
                                     ${statusText}
                                 </div>
-                                <div class="certification-seal">
+                                <div class="certification-seal cursor-pointer hover:scale-105 transition" onclick="showCertModal('${auction.product?.name?.replace(/'/g, "\\'")}', '#GIA-${auction.id}748${auction.id}', '${auction.product?.weight || '3.50'} قيراط', '${auction.product?.clarity || 'VVS1'}', 'قطع وسادة كوشون ممتاز', '${auction.product?.country || 'سريلانكا'}')" title="عرض شهادة الحجر">
                                     <i class="fas fa-award text-white text-sm"></i>
                                 </div>
                             </div>
