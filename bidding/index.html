@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مزاد — تفاصيل الحجر</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">Precious<span>Stones</span></div>
+    <div class="header-actions">
+      <div class="ticker">سعر الذهب: $1,987 · البلاتين: $953</div>
+      <div class="icons">🔔 ❤️ 👤</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="auction-panel">
+      <div class="gallery">
+        <canvas id="particles" aria-hidden="true"></canvas>
+        <div class="spotlight"></div>
+        <img id="stone-img" src="imges/ياقوت أزرق نادر.jpeg" alt="صورة الحجر">
+      </div>
+
+      <aside class="details">
+        <h1 class="stone-title">ياقوت نادر — 3.25 قيراط</h1>
+        <div class="meta">بلد المنشأ: مدغشقر · الوزن: 3.25ct · توثيق: <span class="seal">معتمد</span></div>
+
+        <div class="price-block">
+          <div class="current-price">السعر الحالي</div>
+          <div class="price-row">
+            <div class="price">$12,500</div>
+            <div id="you-top" class="you-top hidden">أنت الأعلى ✨</div>
+          </div>
+
+          <div class="countdown">
+            <div id="countdown-timer">05:00</div>
+            <div class="status">نشط الآن</div>
+          </div>
+
+          <div class="escrow-steps">
+            <div class="step active">دفع</div>
+            <div class="step">حجز</div>
+            <div class="step">شحن</div>
+            <div class="step">فحص</div>
+            <div class="step">تحرير</div>
+          </div>
+
+          <div class="bid-controls">
+            <input id="bid-amount" type="number" min="1" step="1" value="12550" aria-label="قيمة المزايدة">
+            <button id="bid-btn" class="btn-gold">زايد الآن</button>
+          </div>
+
+          <div class="bid-history">
+            <h3>أحدث المزايدات</h3>
+            <ul id="bids-list">
+              <li><strong>فاطمة</strong> — $12,400 · <span class="time">قبل 1m</span></li>
+              <li><strong>أحمد</strong> — $12,300 · <span class="time">قبل 2m</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </aside>
+    </section>
+
+    <section class="live-feed">
+      <div class="feed-header">تدفّق المزادات الحي</div>
+      <div id="feed" class="feed"></div>
+    </section>
+  </main>
+
+  <audio id="metal-click" preload="auto"></audio>
+  <script src="app.js"></script>
+</body>
+</html>
