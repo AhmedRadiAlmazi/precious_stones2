@@ -553,4 +553,54 @@ button, input[type="number"]{touch-action:manipulation}
   background: rgba(255, 255, 255, 0.03);
 }
 
+/* Gold Color Custom Tailwind Compatibility Utilities */
+.bg-gold {
+  background-color: var(--gold) !important;
+}
 
+.bg-gold.bg-opacity-10 {
+  background-color: rgba(202, 163, 74, 0.1) !important;
+}
+
+:root.dark .bg-gold.bg-opacity-10 {
+  background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+.bg-gold.bg-opacity-20 {
+  background-color: rgba(202, 163, 74, 0.2) !important;
+}
+
+:root.dark .bg-gold.bg-opacity-20 {
+  background-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+.hover\:bg-gold:hover {
+  background-color: var(--gold-soft) !important;
+  color: #000000 !important;
+}
+
+.bg-gold:hover {
+  background-color: var(--gold-soft) !important;
+  opacity: 0.9;
+}
+
+.border-gold {
+  border-color: var(--gold) !important;
+}
+
+.focus\:border-gold:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px rgba(202, 163, 74, 0.2) !important;
+}
+
+.text-gold {
+  color: var(--gold) !important;
+}
+
+.hover\:text-gold:hover {
+  color: var(--gold) !important;
+}
+
+.focus\:ring-gold:focus {
+  --tw-ring-color: var(--gold) !important;
+}
