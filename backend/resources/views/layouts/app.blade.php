@@ -34,16 +34,33 @@
     </script>
     @yield('styles')
 </head>
-<body class="theme-transition bg-primary text-primary">
+<body class="theme-transition bg-primary text-primary {{ request()->is('shop') ? 'shop-page' : '' }}">
+
     <!-- الهيدر الذكي -->
     <header class="bg-secondary sticky top-0 z-50 shadow-lg border-b border-color">
         <!-- شريط الأسعار العالمية -->
         <div class="bg-tertiary py-2 overflow-hidden">
             <div class="container mx-auto px-4">
-                <div class="flex space-x-8 rtl:space-x-reverse animate-pulse">
-                    <span class="gold-text"><i class="fas fa-gem mr-2"></i>الذهب: 2,415 ر.س/أوقية</span>
-                    <span class="gold-text"><i class="fas fa-gem mr-2"></i>البلاتين: 1,120 ر.س/أوقية</span>
-                    <span class="gold-text"><i class="fas fa-gem mr-2"></i>الماس: 18,350 ر.س/قيراط</span>
+                <div class="ticker-wrap">
+                    <div class="ticker-track text-sm" style="color:rgba(212,175,55,0.8);">
+                        <span class="mx-8"> ألماس وردي نادر — <strong>85,000 ر.س</strong></span>
+                        <span class="mx-8"> ياقوت بورمي — <strong>42,000 ر.س</strong></span>
+                        <span class="mx-8"> زمرد كولومبي — <strong>35,500 ر.س</strong></span>
+                        <span class="mx-8"> ياقوت أزرق سريلانكي — <strong>18,800 ر.س</strong></span>
+                        <span class="mx-8">عقيق يماني نادر — <strong>6,200 ر.س</strong></span>
+                        <span class="mx-8"> توباز برازيلي — <strong>9,400 ر.س</strong></span>
+                        <span class="mx-8"> شحن مجاني فوق 10,000 ر.س</span>
+                        <span class="mx-8"> جميع الأحجار معتمدة GIA و IGI</span>
+                        
+                        <span class="mx-8"> ألماس وردي نادر — <strong>85,000 ر.س</strong></span>
+                        <span class="mx-8"> ياقوت بورمي — <strong>42,000 ر.س</strong></span>
+                        <span class="mx-8"> زمرد كولومبي — <strong>35,500 ر.س</strong></span>
+                        <span class="mx-8"> ياقوت أزرق سريلانكي — <strong>18,800 ر.س</strong></span>
+                        <span class="mx-8">عقيق يماني نادر — <strong>6,200 ر.س</strong></span>
+                        <span class="mx-8"> توباز برازيلي — <strong>9,400 ر.س</strong></span>
+                        <span class="mx-8"> شحن مجاني فوق 10,000 ر.س</span>
+                        <span class="mx-8"> جميع الأحجار معتمدة GIA و IGI</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -15,7 +15,7 @@
   --input-bg: rgba(0,0,0,0.03);
 }
 
-:root.dark {
+html.dark, :root.dark {
   /* Dark Mode Overrides */
   --bg: #0f0f10;
   --bg-secondary: #1a1a1a;
@@ -562,7 +562,7 @@ button, input[type="number"]{touch-action:manipulation}
   background-color: rgba(202, 163, 74, 0.1) !important;
 }
 
-:root.dark .bg-gold.bg-opacity-10 {
+html.dark .bg-gold.bg-opacity-10, :root.dark .bg-gold.bg-opacity-10 {
   background-color: rgba(212, 175, 55, 0.1) !important;
 }
 
@@ -570,7 +570,7 @@ button, input[type="number"]{touch-action:manipulation}
   background-color: rgba(202, 163, 74, 0.2) !important;
 }
 
-:root.dark .bg-gold.bg-opacity-20 {
+html.dark .bg-gold.bg-opacity-20, :root.dark .bg-gold.bg-opacity-20 {
   background-color: rgba(212, 175, 55, 0.2) !important;
 }
 
@@ -604,3 +604,95 @@ button, input[type="number"]{touch-action:manipulation}
 .focus\:ring-gold:focus {
   --tw-ring-color: var(--gold) !important;
 }
+
+/* ================================================================
+   LUXURY SHOP PAGE — DARK THEME OVERRIDES
+   ================================================================ */
+
+/* Force dark background for shop page */
+body.shop-page {
+  background: #080810 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Spin keyframe for loading spinners */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Gem card reveal transition */
+.gem-card {
+  transition: opacity 0.55s ease, transform 0.55s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* Gold glow pulse used in cert-dot and stats */
+@keyframes glowPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(212,175,55,0.4); }
+  50%      { box-shadow: 0 0 26px rgba(212,175,55,0.85); }
+}
+
+/* Float animation for hero gem decorations */
+@keyframes floatGem {
+  0%,100% { transform: translateY(0px);   }
+  50%     { transform: translateY(-18px); }
+}
+
+/* Ticker marquee */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Splash ring spin */
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+
+/* Splash fade-up */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Splash progress bar fill */
+@keyframes fillBar {
+  from { width: 0;    }
+  to   { width: 100%; }
+}
+
+/* Smooth card shimmer on hover */
+@keyframes shimmerSlide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%);  }
+}
+
+/* Shop-specific header override: hide the layout's light-theme header bg on shop page */
+body.shop-page header.bg-secondary {
+  background: rgba(8,8,16,0.88) !important;
+  backdrop-filter: blur(18px) !important;
+  border-bottom-color: rgba(212,175,55,0.15) !important;
+}
+
+/* Utility: gold text shadow glow */
+.gold-glow {
+  color: #D4AF37;
+  text-shadow: 0 0 28px rgba(212,175,55,0.55);
+}
+
+/* Ticker classes */
+.ticker-wrap {
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
+}
+.ticker-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker 38s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+

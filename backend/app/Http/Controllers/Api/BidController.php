@@ -54,12 +54,22 @@ class BidController extends Controller
                     'is_winning' => true,
                 ]);
 
+                // Anti-sniping mechanism: extend by 2 minutes if bid is placed in the last 60 seconds
+                $secondsLeft = now()->diffInSeconds($auction->end_time, false);
+                if ($secondsLeft > 0 && $secondsLeft <= 60) {
+                    $auction->end_time = $auction->end_time->addSeconds(120);
+                }
+
                 // Update auction price and bid counter atomically
                 $auction->increment('total_bids');
-                $auction->update([
-                    'current_price' => $request->amount,
-                ]);
+                $auction->current_price = $request->amount;
+                $auction->save();
             });
+
+            if ($bid) {
+                $bid->load('user');
+                event(new \App\Events\BidPlaced($bid, $bid->auction));
+            }
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
             return response()->json([
                 'success' => false,

@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\BidController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SellerController;
+use App\Http\Controllers\Api\EscrowController;
+use App\Http\Controllers\Api\AiValuationController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\AdminProductController;
 use App\Http\Controllers\Api\Admin\AdminAuctionController;
@@ -26,6 +28,8 @@ Route::prefix('v1')->group(function () {
     
     // Products - Public
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/recommendations', [AiValuationController::class, 'recommendations']);
+    Route::get('/products/{id}/estimate', [AiValuationController::class, 'estimate']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     
     // Auctions - Public
@@ -52,8 +56,12 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         ->middleware('permission:place-bids');
     Route::get('/my-bids', [BidController::class, 'myBids']);
 
-    // Orders - Buyer
+    // Orders - Buyer & Escrow
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/{id}/pay', [EscrowController::class, 'payWithWallet']);
+    Route::post('/orders/{id}/ship', [EscrowController::class, 'shipOrder']);
+    Route::post('/orders/{id}/deliver', [EscrowController::class, 'deliverOrder']);
+    Route::post('/orders/{id}/release', [EscrowController::class, 'releaseFunds']);
     
     // Seller - Products & Auctions Management
     Route::middleware('role:seller')->group(function () {

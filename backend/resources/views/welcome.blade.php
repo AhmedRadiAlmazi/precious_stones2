@@ -2,28 +2,227 @@
 
 @section('title', 'جوهرة | منصة المزادات الفاخرة')
 
+@section('styles')
+<style>
+    :root {
+        --gold: #D4AF37;
+        --dark-gold: #B8860B;
+        --gold-light: #F5D76E;
+        --bg-dark: #080810;
+        --border-gold: rgba(212,175,55,0.22);
+    }
+
+    /* ===== SPLASH SCREEN ===== */
+    #welcome-splash {
+        position: fixed; inset: 0; z-index: 9998;
+        background: radial-gradient(ellipse at center, #0d0d1a 0%, #040408 100%);
+        display: flex; align-items: center; justify-content: center; flex-direction: column;
+        transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+    #welcome-splash.fade-out { opacity: 0; visibility: hidden; }
+
+    .splash-ring {
+        width: 170px; height: 170px; border-radius: 50%;
+        background: conic-gradient(from 0deg, #D4AF37, #F5D76E, #B8860B, #D4AF37);
+        animation: spinRing 2s linear infinite;
+        display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .splash-ring::before {
+        content: ''; position: absolute; inset: 7px; border-radius: 50%;
+        background: radial-gradient(ellipse at center, #0d0d1a 60%, #1a1a3a 100%);
+    }
+    .splash-icon {
+        position: relative; z-index: 1; font-size: 52px;
+        background: linear-gradient(135deg, #D4AF37, #F5D76E, #B8860B);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 18px rgba(212,175,55,0.8));
+    }
+    .splash-name {
+        font-size: 2.8rem; font-weight: 900; margin-top: 1.8rem;
+        background: linear-gradient(135deg, #D4AF37, #F5D76E, #B8860B);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        opacity: 0; animation: fadeUp 0.6s 0.5s ease forwards;
+    }
+    .splash-sub {
+        color: rgba(212,175,55,0.55); font-size: 0.9rem; margin-top: 0.4rem;
+        opacity: 0; animation: fadeUp 0.6s 0.9s ease forwards;
+        letter-spacing: 0.12em;
+    }
+    .splash-bar {
+        width: 190px; height: 2px;
+        background: rgba(212,175,55,0.15); border-radius: 1px;
+        margin-top: 2rem; overflow: hidden;
+        opacity: 0; animation: fadeUp 0.6s 1.1s ease forwards;
+    }
+    .splash-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #D4AF37, #F5D76E);
+        animation: fillBar 1.8s 1.3s ease forwards; width: 0;
+    }
+
+    /* ===== HERO SLIDER OVERRIDES ===== */
+    .parallax {
+        background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%),
+                    var(--bg-tertiary) !important;
+        border-bottom: 1px solid var(--border-gold);
+        transition: background-color 0.3s;
+    }
+
+    /* ===== LUXURY CARDS ===== */
+    .card-hover {
+        background: var(--bg-secondary) !important;
+        border: 1px solid var(--border-color) !important;
+        transition: all 0.4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    .card-hover:hover {
+        transform: translateY(-8px) scale(1.015);
+        border-color: rgba(212,175,55,0.55) !important;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.15), 0 0 30px rgba(212,175,55,0.1) !important;
+    }
+    .dark .card-hover:hover {
+        box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(212,175,55,0.15) !important;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes spinRing { to { transform:rotate(360deg); } }
+    @keyframes fadeUp { from { opacity:0;transform:translateY(18px); } to { opacity:1;transform:translateY(0); } }
+    @keyframes fillBar { from { width:0; } to { width:100%; } }
+    @keyframes glowPulse { 0%,100%{box-shadow:0 0 8px rgba(212,175,55,.4);} 50%{box-shadow:0 0 24px rgba(212,175,55,.8);} }
+
+    /* For suppliers / trusted members card */
+    .supplier-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    .supplier-card:hover {
+        border-color: var(--gold);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        transform: translateY(-4px);
+    }
+
+    /* ===== TICKER MARQUEE AD ANIMATIONS ===== */
+    @keyframes slide-ltr {
+        0% { transform: translate3d(-50%, 0, 0); }
+        100% { transform: translate3d(0, 0, 0); }
+    }
+    @keyframes slide-rtl {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(-50%, 0, 0); }
+    }
+    .animate-slide-ltr {
+        display: flex;
+        width: max-content;
+        animation: slide-ltr 35s linear infinite;
+    }
+    .animate-slide-rtl {
+        display: flex;
+        width: max-content;
+        animation: slide-rtl 35s linear infinite;
+    }
+    .ad-marquee-container {
+        position: relative;
+    }
+    .ad-marquee-container::before, .ad-marquee-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 150px;
+        z-index: 10;
+        pointer-events: none;
+        transition: background 0.3s;
+    }
+    .ad-marquee-container::before {
+        left: 0;
+        background: linear-gradient(to right, var(--bg-tertiary) 0%, transparent 100%);
+    }
+    .ad-marquee-container::after {
+        right: 0;
+        background: linear-gradient(to left, var(--bg-tertiary) 0%, transparent 100%);
+    }
+    .ticker-wrap {
+        overflow: hidden;
+        width: 100%;
+        display: flex;
+        direction: ltr !important;
+    }
+</style>
+@endsection
+
 @section('content')
+{{-- ===== SPLASH SCREEN ===== --}}
+<div id="welcome-splash">
+    <canvas id="splash-canvas" style="position:absolute;inset:0;pointer-events:none;"></canvas>
+    <div style="position:relative;z-index:1;text-align:center;">
+        <div class="splash-ring"><i class="fas fa-gem splash-icon"></i></div>
+        <div class="splash-name">جوهرة</div>
+        <div class="splash-sub">JAWHARA · PRECIOUS STONES</div>
+        <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+    </div>
+</div>
     <!-- السلايدر الرئيسي -->
-    <section class="relative py-16 md:py-28 overflow-hidden bg-tertiary parallax flex items-center">
+    <section class="relative py-20 md:py-32 overflow-hidden bg-tertiary flex items-center min-h-[500px]">
+        <!-- الخلفيات المتحركة (Slideshow) -->
+        <div class="absolute inset-0 z-0">
+            <div class="hero-slide absolute inset-0 opacity-100 transition-opacity duration-1000 ease-in-out bg-cover bg-center" style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/ألماس وردي نادر من جنوب أفريقيا.jpeg') }}');"></div>
+            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/زمرد كولومبي نقي عالي الجودة.jpeg') }}');"></div>
+            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/ياقوت أزرق نادر.jpeg') }}');"></div>
+        </div>
+
         <div class="particles-container" id="particles-container"></div>
         
-        <div class="absolute inset-0 bg-black bg-opacity-20 z-10"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
         
         <div class="relative z-20 container mx-auto px-4">
-            <div class="max-w-2xl">
-                <h1 class="text-3xl md:text-5xl font-bold mb-4 gold-text">اكتشف عالم الأحجار النادرة</h1>
-                <p class="text-lg md:text-xl mb-8 text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة</p>
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
-                    <a href="{{ url('/shop') }}" class="gold-gradient text-white text-center font-bold py-3 px-6 rounded-full ripple shine-effect">
+            <div class="max-w-2xl text-right">
+                <h1 class="text-3xl md:text-5xl font-bold mb-4 gold-text leading-tight">اكتشف عالم الأحجار النادرة</h1>
+                <p class="text-lg md:text-xl mb-8 text-white opacity-95">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-start">
+                    <a href="{{ url('/shop') }}" class="gold-gradient text-black text-center font-bold py-3 px-8 rounded-full ripple shine-effect transition transform hover:scale-105">
                         استكشف الآن
                     </a>
-                    <a href="{{ url('/auctions') }}" class="bg-transparent text-center border-2 border-yellow-500 text-yellow-500 font-bold py-3 px-6 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                    <a href="{{ url('/auctions') }}" class="bg-transparent text-center border-2 border-yellow-500 text-yellow-500 font-bold py-3 px-8 rounded-full hover:bg-yellow-500 hover:text-black transition transform hover:scale-105">
                         تصفح المزادات
                     </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- إعلانات متحركة من اليسار إلى اليمين -->
+    <section class="py-10 overflow-hidden bg-tertiary border-b border-color ad-marquee-container">
+        <div class="ticker-wrap select-none">
+            <div class="animate-slide-ltr gap-6" id="ads-ltr-container">
+                <!-- جاري التحميل... -->
+                <div class="inline-block relative rounded-2xl overflow-hidden border border-color min-w-[320px] md:min-w-[450px] h-[180px] bg-secondary flex-shrink-0 mx-3 shadow-lg animate-pulse"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- حاوية مقاييس الضمان والتميز -->
+    <div class="container mx-auto px-4 my-10 py-6 border-b border-color">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="stat-sep text-center py-4 px-6 border-l border-color last:border-l-0">
+                <div class="text-xl font-black" style="color:#D4AF37;"> GIA معتمد</div>
+                <div class="text-xs mt-1 text-secondary">جميع الأحجار موثقة دولياً</div>
+            </div>
+            <div class="stat-sep text-center py-4 px-6 border-l border-color last:border-l-0">
+                <div class="text-xl font-black" style="color:#D4AF37;">🔒 Escrow</div>
+                <div class="text-xs mt-1 text-secondary">ضمان مالي محمي</div>
+            </div>
+            <div class="stat-sep text-center py-4 px-6 border-l border-color last:border-l-0">
+                <div class="text-xl font-black" style="color:#D4AF37;">🚀 شحن عالمي</div>
+                <div class="text-xs mt-1 text-secondary">توصيل مؤمّن لـ 48 دولة</div>
+            </div>
+            <div class="stat-sep text-center py-4 px-6">
+                <div class="text-xl font-black" style="color:#D4AF37;">↩️ إرجاع مضمون</div>
+                <div class="text-xs mt-1 text-secondary">48 ساعة للفحص والإرجاع</div>
+            </div>
+        </div>
+    </div>
 
     <!-- المنتجات المميزة -->
     <section class="py-16 fade-in">
@@ -41,6 +240,16 @@
                 <div class="col-span-full text-center py-12">
                     <i class="fas fa-spinner fa-spin text-4xl text-yellow-500"></i>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- إعلانات متحركة من اليسار إلى اليمين (الصف الثاني) -->
+    <section class="py-10 overflow-hidden bg-tertiary border-b border-color ad-marquee-container">
+        <div class="ticker-wrap select-none">
+            <div class="animate-slide-ltr gap-6" id="ads-rtl-container">
+                <!-- جاري التحميل... -->
+                <div class="inline-block relative rounded-2xl overflow-hidden border border-color min-w-[320px] md:min-w-[450px] h-[180px] bg-secondary flex-shrink-0 mx-3 shadow-lg animate-pulse"></div>
             </div>
         </div>
     </section>
@@ -173,6 +382,81 @@
 
 @section('scripts')
     <script>
+        // ============================================================
+        // SPLASH SCREEN
+        // ============================================================
+        (function() {
+            const splash = document.getElementById('welcome-splash');
+            const isSplashShown = sessionStorage.getItem('jawhara_splash_shown');
+            
+            if (isSplashShown) {
+                if (splash) {
+                    splash.style.display = 'none';
+                }
+                document.body.style.overflow = '';
+                return;
+            }
+
+            document.body.style.overflow = 'hidden';
+            const canvas = document.getElementById('splash-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const pts = Array.from({length:80},()=>({
+                x:Math.random()*canvas.width,
+                y:Math.random()*canvas.height,
+                r:Math.random()*2+.4,
+                vx:(Math.random()-.5)*.4,
+                vy:-.3-Math.random()*.5,
+                a:.3+Math.random()*.5
+            }));
+            function drawSplash() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                pts.forEach(p=>{
+                    p.x+=p.vx;
+                    p.y+=p.vy;
+                    if(p.y<-10){
+                        p.y=canvas.height+10;
+                        p.x=Math.random()*canvas.width;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+                    ctx.fillStyle=`rgba(212,175,55,${p.a})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(drawSplash);
+            }
+            drawSplash();
+            
+            setTimeout(()=>{
+                sessionStorage.setItem('jawhara_splash_shown', 'true');
+                if (splash) {
+                    splash.classList.add('fade-out');
+                    setTimeout(()=>{
+                        splash.style.display='none';
+                        document.body.style.overflow='';
+                    }, 850);
+                }
+            }, 3200);
+        })();
+
+        // ============================================================
+        // HERO SLIDESHOW
+        // ============================================================
+        (function() {
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.hero-slide');
+            if (slides.length === 0) return;
+            
+            setInterval(() => {
+                slides[currentSlide].classList.remove('opacity-100');
+                slides[currentSlide].classList.add('opacity-0');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.remove('opacity-0');
+                slides[currentSlide].classList.add('opacity-100');
+            }, 5000); // Change image every 5 seconds
+        })();
+
         // --- تأثيرات الجسيمات والتأثيرات الحركية ---
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
@@ -319,6 +603,66 @@
                         }
                     }
                 });
+            }
+
+            // 0. جلب منتجات الإعلانات المتحركة
+            try {
+                const adsResponse = await api.getProducts({ is_featured: 1, limit: 12 });
+                const allAds = adsResponse.data?.data || adsResponse.data || [];
+                const activeAds = allAds.filter(p => p.is_active);
+                
+                const ltrContainer = document.getElementById('ads-ltr-container');
+                const rtlContainer = document.getElementById('ads-rtl-container');
+                
+                if (activeAds.length > 0) {
+                    let displayAds = [...activeAds];
+                    // Ensure we have enough items for continuous carousel scrolling
+                    while (displayAds.length < 12) {
+                        displayAds = [...displayAds, ...activeAds];
+                    }
+                    
+                    // LTR ads
+                    ltrContainer.innerHTML = displayAds.map(product => {
+                        const img = product.images && product.images.length > 0 ? getImageUrl(product.images[0]) : '{{ asset("imges/ياقوت أزرق نادر.jpeg") }}';
+                        return `
+                        <a href="{{ url('/shop') }}?id=${product.id}" class="inline-block relative rounded-2xl overflow-hidden border border-color min-w-[300px] md:min-w-[420px] h-[180px] bg-[#0d0d15] flex-shrink-0 mx-3 shadow-lg hover:border-gold transition-colors duration-300">
+                            <img src="${img}" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                            <div class="absolute inset-0 bg-gradient-to-l from-black/95 via-black/80 to-black/35 p-6 flex flex-col justify-center text-right">
+                                <span class="text-xs text-yellow-500 font-bold">✦ عرض مميز ✦</span>
+                                <h3 class="text-lg font-black text-white mt-1 truncate">${product.name}</h3>
+                                <p class="text-xs text-gray-300 mt-1 truncate">${product.origin_country || 'أحجار طبيعية معتمدة'}</p>
+                                <span class="text-sm text-yellow-500 font-black mt-2">${parseFloat(product.price).toLocaleString()} ر.س</span>
+                            </div>
+                        </a>
+                        `;
+                    }).join('');
+                    
+                    // RTL ads (reversed for variety)
+                    const displayAdsRtl = [...displayAds].reverse();
+                    rtlContainer.innerHTML = displayAdsRtl.map(product => {
+                        const img = product.images && product.images.length > 0 ? getImageUrl(product.images[0]) : '{{ asset("imges/ياقوت أزرق نادر.jpeg") }}';
+                        return `
+                        <a href="{{ url('/shop') }}?id=${product.id}" class="inline-block relative rounded-2xl overflow-hidden border border-color min-w-[300px] md:min-w-[420px] h-[180px] bg-[#0d0d15] flex-shrink-0 mx-3 shadow-lg hover:border-gold transition-colors duration-300">
+                            <img src="${img}" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                            <div class="absolute inset-0 bg-gradient-to-l from-black/95 via-black/80 to-black/35 p-6 flex flex-col justify-center text-right">
+                                <span class="text-xs text-yellow-500 font-bold">✦ عرض خاص ✦</span>
+                                <h3 class="text-lg font-black text-white mt-1 truncate">${product.name}</h3>
+                                <p class="text-xs text-gray-300 mt-1 truncate">${product.origin_country || 'أحجار طبيعية معتمدة'}</p>
+                                <span class="text-sm text-yellow-500 font-black mt-2">${parseFloat(product.price).toLocaleString()} ر.س</span>
+                            </div>
+                        </a>
+                        `;
+                    }).join('');
+                } else {
+                    const fallbackHtml = `
+                    <div class="inline-block relative rounded-2xl overflow-hidden border border-color min-w-[300px] md:min-w-[420px] h-[180px] bg-[#0d0d15] flex-shrink-0 mx-3 shadow-lg flex items-center justify-center text-center">
+                        <span class="text-secondary text-sm">شاهد الأحجار المميزة بالمتجر</span>
+                    </div>`;
+                    ltrContainer.innerHTML = fallbackHtml;
+                    rtlContainer.innerHTML = fallbackHtml;
+                }
+            } catch (adError) {
+                console.error("Error loading ads:", adError);
             }
 
             // 1. جلب المنتجات المميزة

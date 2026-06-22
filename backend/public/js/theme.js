@@ -8,10 +8,12 @@
     // 1. Immediate Theme Application (Prevent FOUC)
     // Check local storage or system preference
     const savedTheme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+    if (savedTheme === 'dark' || !savedTheme) {
         document.documentElement.classList.add('dark');
+        if (!savedTheme) {
+            localStorage.setItem('theme', 'dark');
+        }
     } else {
         document.documentElement.classList.remove('dark');
     }
