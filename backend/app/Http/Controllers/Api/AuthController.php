@@ -3,76 +3,77 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     /**
-     * Register a new user
+     * Register a new user.
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:20|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'account_type' => 'required|in:buyer,seller',
-        ]);
-
         $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+            'first_name'   => $request->first_name,
+            'last_name'    => $request->last_name,
+            'email'        => $request->email,
+            'phone'        => $request->phone,
+            'password'     => $request->password, // auto-hashed via model cast
             'account_type' => $request->account_type,
-            'is_approved' => $request->account_type === 'buyer' ? true : false, // Auto-approve buyers
+            'is_approved'  => $request->account_type === 'buyer', // buyers auto-approved, sellers need review
         ]);
 
         // Assign role based on account type
         $role = $request->account_type === 'seller' ? 'seller' : 'buyer';
         $user->assignRole($role);
 
-        // Create token
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Only issue a token for buyers (sellers must wait for admin approval)
+        $token = null;
+        if ($request->account_type === 'buyer') {
+            $token = $user->createToken('auth_token')->plainTextToken;
+        }
 
         return response()->json([
             'success' => true,
-            'message' => $request->account_type === 'seller' 
+            'message' => $request->account_type === 'seller'
                 ? 'تم التسجيل بنجاح. في انتظار موافقة الإدارة.'
                 : 'تم التسجيل بنجاح!',
             'data' => [
-                'user' => $user,
-                'token' => $token,
-                'token_type' => 'Bearer',
+                'user'         => new UserResource($user),
+                'token'        => $token,
+                'token_type'   => $token ? 'Bearer' : null,
+                'needs_approval' => $request->account_type === 'seller',
             ],
         ], 201);
     }
 
     /**
-     * Login user
+     * Login user and return API token.
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['البريد الإلكتروني أو كلمة المرور غير صحيحة.'],
             ]);
         }
 
-        // Check if seller is approved
+        // Block inactive accounts
+        if (!$user->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حسابك معطّل. يرجى التواصل مع الإدارة.',
+            ], 403);
+        }
+
+        // Block unapproved sellers
         if ($user->account_type === 'seller' && !$user->is_approved) {
             return response()->json([
                 'success' => false,
@@ -80,24 +81,25 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Create token
+        // Revoke all old tokens and issue a fresh one (prevents session accumulation)
+        $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'تم تسجيل الدخول بنجاح!',
-            'data' => [
-                'user' => $user->load('roles'),
-                'token' => $token,
+            'data'    => [
+                'user'       => new UserResource($user->load('roles')),
+                'token'      => $token,
                 'token_type' => 'Bearer',
             ],
         ]);
     }
 
     /**
-     * Logout user
+     * Logout: revoke current token.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
@@ -108,13 +110,13 @@ class AuthController extends Controller
     }
 
     /**
-     * Get authenticated user
+     * Return the authenticated user's profile.
      */
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         return response()->json([
             'success' => true,
-            'data' => $request->user()->load('roles', 'permissions'),
+            'data'    => new UserResource($request->user()->load('roles', 'permissions')),
         ]);
     }
 }

@@ -3,137 +3,131 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreProductRequest;
+use App\Http\Requests\Api\UpdateProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    /** Allowed columns for sorting (prevents SQL injection) */
+    private const ALLOWED_SORTS = ['created_at', 'price', 'name', 'views_count', 'stock'];
+
     /**
-     * Display a listing of products
+     * Display a listing of active products.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $query = Product::with(['seller', 'category', 'reviews'])
+        $query = Product::with(['seller:id,first_name,last_name', 'category'])
+            ->withCount('reviews')
             ->active();
 
         // Filters
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
+        if ($request->filled('category_id')) {
+            $query->where('category_id', (int) $request->category_id);
         }
 
-        if ($request->has('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', (float) $request->min_price);
         }
 
-        if ($request->has('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', (float) $request->max_price);
         }
 
-        if ($request->has('featured')) {
+        if ($request->boolean('featured')) {
             $query->featured();
         }
 
-        if ($request->has('in_stock')) {
+        if ($request->boolean('in_stock')) {
             $query->inStock();
         }
 
-        // Search
-        if ($request->has('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
+        // Safe sorting via whitelist
+        $sortBy    = in_array($request->sort_by, self::ALLOWED_SORTS) ? $request->sort_by : 'created_at';
+        $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
-        $products = $query->paginate($request->get('per_page', 15));
+        $perPage  = min((int) $request->get('per_page', 15), 100);
+        $products = $query->paginate($perPage);
 
         return response()->json([
             'success' => true,
-            'data' => $products,
+            'data'    => ProductResource::collection($products)->response()->getData(true),
         ]);
     }
 
     /**
-     * Store a new product (Seller only)
+     * Store a newly created product (Seller only).
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request): JsonResponse
     {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'origin_country' => 'nullable|string|max:255',
-            'certification' => 'nullable|string|max:255',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120', // Allow images up to 5MB
-        ]);
-
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                // Store in 'public/products' and get the URL
-                $path = $image->store('products', 'public');
-                // Create a full URL or relative path depending on frontend needs. 
-                // Storage::url() usually returns /storage/products/filename.jpg
+                $path         = $image->store('products', 'public');
                 $imagePaths[] = Storage::url($path);
             }
         }
 
         $product = Product::create([
-            'seller_id' => $request->user()->id,
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'weight' => $request->weight,
+            'seller_id'      => $request->user()->id,
+            'category_id'    => $request->category_id,
+            'name'           => $request->name,
+            'description'    => $request->description,
+            'price'          => $request->price,
+            'stock'          => $request->stock,
+            'weight'         => $request->weight,
             'origin_country' => $request->origin_country,
-            'certification' => $request->certification,
-            'images' => $imagePaths, // Save file paths
-            'is_active' => true,
+            'certification'  => $request->certification,
+            'images'         => $imagePaths,
+            'is_active'      => true,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'تم إضافة المنتج بنجاح!',
-            'data' => $product->load('category'),
+            'data'    => new ProductResource($product->load('category')),
         ], 201);
     }
 
     /**
-     * Display a specific product
+     * Display a specific product.
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        $product = Product::with(['seller', 'category', 'reviews.user', 'auction'])
+        $product = Product::with(['seller:id,first_name,last_name', 'category', 'reviews.user', 'auction'])
             ->findOrFail($id);
 
-        // Increment views
+        // Increment views count atomically
         $product->increment('views_count');
 
         return response()->json([
             'success' => true,
-            'data' => $product,
+            'data'    => new ProductResource($product),
         ]);
     }
 
     /**
-     * Update a product (Owner or Admin only)
+     * Update a product (Owner or Admin only).
      */
-    public function update(Request $request, $id)
+    public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
         $product = Product::findOrFail($id);
 
-        // Check ownership
+        // Authorization check
         if ($product->seller_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
             return response()->json([
                 'success' => false,
@@ -141,38 +135,37 @@ class ProductController extends Controller
             ], 403);
         }
 
-        $request->validate([
-            'category_id' => 'sometimes|exists:categories,id',
-            'name' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string',
-            'price' => 'sometimes|numeric|min:0',
-            'stock' => 'sometimes|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'origin_country' => 'nullable|string|max:255',
-            'certification' => 'nullable|string|max:255',
-            'images' => 'nullable|array',
+        // Handle new images if provided
+        $data = $request->only([
+            'category_id', 'name', 'description', 'price', 'stock',
+            'weight', 'origin_country', 'certification',
         ]);
 
-        $product->update($request->only([
-            'category_id', 'name', 'description', 'price', 'stock',
-            'weight', 'origin_country', 'certification', 'images'
-        ]));
+        if ($request->hasFile('images')) {
+            $imagePaths = [];
+            foreach ($request->file('images') as $image) {
+                $path         = $image->store('products', 'public');
+                $imagePaths[] = Storage::url($path);
+            }
+            $data['images'] = $imagePaths;
+        }
+
+        $product->update($data);
 
         return response()->json([
             'success' => true,
             'message' => 'تم تحديث المنتج بنجاح!',
-            'data' => $product->fresh(['category']),
+            'data'    => new ProductResource($product->fresh(['category'])),
         ]);
     }
 
     /**
-     * Delete a product (Owner or Admin only)
+     * Delete a product (Owner or Admin only).
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, int $id): JsonResponse
     {
         $product = Product::findOrFail($id);
 
-        // Check ownership
         if ($product->seller_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
             return response()->json([
                 'success' => false,
@@ -180,7 +173,19 @@ class ProductController extends Controller
             ], 403);
         }
 
-        $product->delete();
+        // Prevent deletion if product has active auctions
+        $hasActiveAuctions = $product->auction()
+            ->whereIn('status', ['pending', 'active'])
+            ->exists();
+
+        if ($hasActiveAuctions) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن حذف المنتج لأنه مرتبط بمزادات نشطة.',
+            ], 422);
+        }
+
+        $product->delete(); // SoftDelete
 
         return response()->json([
             'success' => true,
@@ -189,18 +194,19 @@ class ProductController extends Controller
     }
 
     /**
-     * Get seller's products
+     * Get the authenticated seller's products.
      */
-    public function myProducts(Request $request)
+    public function myProducts(Request $request): JsonResponse
     {
         $products = Product::where('seller_id', $request->user()->id)
-            ->with(['category', 'reviews'])
+            ->with(['category'])
+            ->withCount('reviews')
             ->latest()
             ->paginate(15);
 
         return response()->json([
             'success' => true,
-            'data' => $products,
+            'data'    => ProductResource::collection($products)->response()->getData(true),
         ]);
     }
 }

@@ -29,6 +29,7 @@ class User extends Authenticatable
         'is_approved',
         'is_active',
         'avatar',
+        'settings',
         'wallet_balance',
     ];
 
@@ -55,6 +56,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_approved' => 'boolean',
             'is_active' => 'boolean',
+            'settings' => 'array',
             'wallet_balance' => 'float',
         ];
     }

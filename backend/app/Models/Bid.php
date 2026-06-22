@@ -9,8 +9,7 @@ class Bid extends Model
 {
     use HasFactory;
 
-    public $timestamps = true; // Automatically manage created_at
-    const UPDATED_AT = null; // No updated_at column in bids table
+    public $timestamps = true; // Automatically manage created_at and updated_at
 
     protected $fillable = [
         'auction_id',

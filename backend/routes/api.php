@@ -5,6 +5,14 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\AuctionController;
 use App\Http\Controllers\Api\BidController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\SettingsController;
+use App\Http\Controllers\Api\SellerController;
+use App\Http\Controllers\Api\Admin\AdminUserController;
+use App\Http\Controllers\Api\Admin\AdminProductController;
+use App\Http\Controllers\Api\Admin\AdminAuctionController;
+use App\Http\Controllers\Api\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\Admin\AdminOrderController;
+use App\Http\Controllers\Api\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,9 +33,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/auctions/{id}', [AuctionController::class, 'show']);
     Route::get('/auctions/{id}/bids', [BidController::class, 'auctionBids']);
     
-    // Authentication Routes
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    // Authentication Routes with Rate Limiting (10 requests per minute)
+    Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+    });
 });
 
 // Protected Routes (Authentication Required)
@@ -45,8 +55,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Orders - Buyer
     Route::post('/orders', [OrderController::class, 'store']);
     
-    // Seller Routes
-    Route::middleware('auth:sanctum')->group(function () {
+    // Seller - Products & Auctions Management
+    Route::middleware('role:seller')->group(function () {
         // Products
         Route::post('/products', [ProductController::class, 'store'])
             ->middleware('permission:create-products');
@@ -65,57 +75,60 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::get('/my-auctions', [AuctionController::class, 'myAuctions']);
     });
     
-    // Admin Routes
-    Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    // Admin Routes (Restricted to admin role)
+    Route::middleware('role:admin')->prefix('admin')->group(function () {
         // User Management
-        Route::get('/users', [\App\Http\Controllers\Api\AdminController::class, 'getAllUsers']);
-        Route::put('/users/{id}', [\App\Http\Controllers\Api\AdminController::class, 'updateUser']);
-        Route::delete('/users/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteUser']);
-        Route::post('/users/{id}/toggle-status', [\App\Http\Controllers\Api\AdminController::class, 'toggleUserStatus']);
-        Route::get('/sellers/pending', [\App\Http\Controllers\Api\AdminController::class, 'getPendingSellers']);
-        Route::post('/sellers/{id}/approve', [\App\Http\Controllers\Api\AdminController::class, 'approveSeller']);
-        Route::post('/sellers/{id}/reject', [\App\Http\Controllers\Api\AdminController::class, 'rejectSeller']);
-        Route::get('/stats', [\App\Http\Controllers\Api\AdminController::class, 'getDashboardStats']);
+        Route::get('/users', [AdminUserController::class, 'index']);
+        Route::put('/users/{id}', [AdminUserController::class, 'update']);
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+        Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
+        Route::get('/sellers/pending', [AdminUserController::class, 'pendingSellers']);
+        Route::post('/sellers/{id}/approve', [AdminUserController::class, 'approveSeller']);
+        Route::post('/sellers/{id}/reject', [AdminUserController::class, 'rejectSeller']);
+        Route::get('/stats', [AdminDashboardController::class, 'getDashboardStats']);
         
         // Auction Management
-        Route::get('/auctions/pending', [\App\Http\Controllers\Api\AdminController::class, 'getPendingAuctions']);
-        Route::post('/auctions/{id}/approve', [\App\Http\Controllers\Api\AdminController::class, 'approveAuction']);
-        Route::post('/auctions/{id}/reject', [\App\Http\Controllers\Api\AdminController::class, 'rejectAuction']);
-        Route::get('/auctions', [\App\Http\Controllers\Api\AdminController::class, 'getAllAuctions']);
-        Route::put('/auctions/{id}', [\App\Http\Controllers\Api\AdminController::class, 'updateAuction']);
-        Route::delete('/auctions/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteAuction']);
-        Route::post('/auctions/{id}/end', [\App\Http\Controllers\Api\AdminController::class, 'endAuction']);
+        Route::get('/auctions/pending', [AdminAuctionController::class, 'pending']);
+        Route::post('/auctions/{id}/approve', [AdminAuctionController::class, 'approve']);
+        Route::post('/auctions/{id}/reject', [AdminAuctionController::class, 'reject']);
+        Route::get('/auctions', [AdminAuctionController::class, 'index']);
+        Route::put('/auctions/{id}', [AdminAuctionController::class, 'update']);
+        Route::delete('/auctions/{id}', [AdminAuctionController::class, 'destroy']);
+        Route::post('/auctions/{id}/end', [AdminAuctionController::class, 'end']);
 
         // Product Management
-        Route::get('/products', [\App\Http\Controllers\Api\AdminController::class, 'getAllProducts']);
-        Route::put('/products/{id}', [\App\Http\Controllers\Api\AdminController::class, 'updateProduct']);
-        Route::delete('/products/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteProduct']);
-        Route::post('/products/{id}/toggle-status', [\App\Http\Controllers\Api\AdminController::class, 'toggleProductStatus']);
-        Route::get('/orders', [\App\Http\Controllers\Api\AdminController::class, 'getAllOrders']);
-        Route::put('/orders/{id}/status', [\App\Http\Controllers\Api\AdminController::class, 'updateOrderStatus']);
+        Route::get('/products', [AdminProductController::class, 'index']);
+        Route::put('/products/{id}', [AdminProductController::class, 'update']);
+        Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
+        Route::post('/products/{id}/toggle-status', [AdminProductController::class, 'toggleStatus']);
+        
+        // Order Management
+        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::put('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
 
         // Category Management
-        Route::get('/categories', [\App\Http\Controllers\Api\AdminController::class, 'getAllCategories']);
-        Route::post('/categories', [\App\Http\Controllers\Api\AdminController::class, 'createCategory']);
-        Route::put('/categories/{id}', [\App\Http\Controllers\Api\AdminController::class, 'updateCategory']);
-        Route::delete('/categories/{id}', [\App\Http\Controllers\Api\AdminController::class, 'deleteCategory']);
-        Route::post('/categories/{id}/toggle-status', [\App\Http\Controllers\Api\AdminController::class, 'toggleCategoryStatus']);
+        Route::get('/categories', [AdminCategoryController::class, 'index']);
+        Route::post('/categories', [AdminCategoryController::class, 'store']);
+        Route::put('/categories/{id}', [AdminCategoryController::class, 'update']);
+        Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy']);
+        Route::post('/categories/{id}/toggle-status', [AdminCategoryController::class, 'toggleStatus']);
 
         // Settings Management
-        Route::get('/settings', [\App\Http\Controllers\Api\SettingsController::class, 'index']);
-        Route::get('/settings/{key}', [\App\Http\Controllers\Api\SettingsController::class, 'show']);
-        Route::put('/settings', [\App\Http\Controllers\Api\SettingsController::class, 'update']);
-        Route::put('/settings/{key}', [\App\Http\Controllers\Api\SettingsController::class, 'updateSingle']);
+        Route::get('/settings', [SettingsController::class, 'index']);
+        Route::get('/settings/{key}', [SettingsController::class, 'show']);
+        Route::put('/settings', [SettingsController::class, 'update']);
+        Route::put('/settings/{key}', [SettingsController::class, 'updateSingle']);
     });
 
-    // Seller Routes
-    Route::middleware('auth:sanctum')->prefix('seller')->group(function () {
-        Route::get('/orders', [\App\Http\Controllers\Api\SellerController::class, 'getOrders']);
-        Route::put('/orders/{id}/status', [\App\Http\Controllers\Api\SellerController::class, 'updateOrderStatus']);
-        Route::get('/statistics', [\App\Http\Controllers\Api\SellerController::class, 'getStatistics']);
-        Route::get('/earnings', [\App\Http\Controllers\Api\SellerController::class, 'getEarnings']);
-        Route::get('/profile', [\App\Http\Controllers\Api\SellerController::class, 'getProfile']);
-        Route::put('/profile', [\App\Http\Controllers\Api\SellerController::class, 'updateProfile']);
-        Route::put('/settings', [\App\Http\Controllers\Api\SellerController::class, 'updateSettings']);
+    // Seller Specific Routes (Restricted to seller role)
+    Route::middleware('role:seller')->prefix('seller')->group(function () {
+        Route::get('/orders', [SellerController::class, 'getOrders']);
+        Route::put('/orders/{id}/status', [SellerController::class, 'updateOrderStatus']);
+        Route::get('/statistics', [SellerController::class, 'getStatistics']);
+        Route::get('/earnings', [SellerController::class, 'getEarnings']);
+        Route::get('/profile', [SellerController::class, 'getProfile']);
+        Route::put('/profile', [SellerController::class, 'updateProfile']);
+        Route::put('/settings', [SellerController::class, 'updateSettings']);
     });
 });
+

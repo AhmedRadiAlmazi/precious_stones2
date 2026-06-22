@@ -16,6 +16,7 @@ class Order extends Model
         'auction_id',
         'order_number',
         'total_amount',
+        'quantity',
         'status',
         'payment_method',
         'payment_status',
@@ -26,6 +27,7 @@ class Order extends Model
 
     protected $casts = [
         'total_amount' => 'decimal:2',
+        'quantity' => 'integer',
         'shipping_address' => 'array',
     ];
 

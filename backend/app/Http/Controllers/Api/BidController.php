@@ -3,79 +3,87 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreBidRequest;
+use App\Http\Resources\BidResource;
 use App\Models\Auction;
 use App\Models\Bid;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BidController extends Controller
 {
     /**
-     * Place a bid on an auction
+     * Place a bid on an auction.
+     * Uses DB::transaction + lockForUpdate to prevent race conditions.
      */
-    public function store(Request $request)
+    public function store(StoreBidRequest $request): JsonResponse
     {
-        $request->validate([
-            'auction_id' => 'required|exists:auctions,id',
-            'amount' => 'required|numeric|min:0',
-        ]);
+        $bid = null;
 
-        $auction = Auction::with('bids')->findOrFail($request->auction_id);
+        try {
+            DB::transaction(function () use ($request, &$bid) {
+                // Lock the auction row to prevent concurrent bids
+                $auction = Auction::lockForUpdate()->findOrFail($request->auction_id);
 
-        // Check if auction is active
-        if (!$auction->isActive()) {
+                // Check if auction is active (re-check inside transaction)
+                if (!$auction->isActive()) {
+                    abort(422, 'هذا المزاد غير نشط حالياً.');
+                }
+
+                // Prevent seller from bidding on their own auction
+                if ($auction->seller_id === $request->user()->id) {
+                    abort(403, 'لا يمكنك المزايدة على مزادك الخاص.');
+                }
+
+                // Enforce minimum bid amount
+                $minBid = $auction->current_price + $auction->bid_increment;
+                if ($request->amount < $minBid) {
+                    abort(422, "الحد الأدنى للمزايدة هو {$minBid} ر.س");
+                }
+
+                // Mark all previous bids as non-winning
+                Bid::where('auction_id', $auction->id)->update(['is_winning' => false]);
+
+                // Create the new winning bid
+                $bid = Bid::create([
+                    'auction_id' => $auction->id,
+                    'user_id'    => $request->user()->id,
+                    'amount'     => $request->amount,
+                    'is_winning' => true,
+                ]);
+
+                // Update auction price and bid counter atomically
+                $auction->increment('total_bids');
+                $auction->update([
+                    'current_price' => $request->amount,
+                ]);
+            });
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'هذا المزاد غير نشط حالياً.',
-            ], 422);
-        }
-
-        // Check if user is the seller
-        if ($auction->seller_id === $request->user()->id) {
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        } catch (\Throwable $e) {
+            Log::error('Bid placement failed', ['error' => $e->getMessage(), 'user_id' => $request->user()->id]);
             return response()->json([
                 'success' => false,
-                'message' => 'لا يمكنك المزايدة على مزادك الخاص.',
-            ], 403);
+                'message' => 'فشل تقديم المزايدة. يرجى المحاولة مجدداً.',
+            ], 500);
         }
-
-        // Check minimum bid amount
-        $minBid = $auction->current_price + $auction->bid_increment;
-        if ($request->amount < $minBid) {
-            return response()->json([
-                'success' => false,
-                'message' => "الحد الأدنى للمزايدة هو {$minBid} ر.س",
-            ], 422);
-        }
-
-        // Create the bid
-        $bid = Bid::create([
-            'auction_id' => $auction->id,
-            'user_id' => $request->user()->id,
-            'amount' => $request->amount,
-            'is_winning' => true,
-        ]);
-
-        // Update previous winning bid
-        Bid::where('auction_id', $auction->id)
-            ->where('id', '!=', $bid->id)
-            ->update(['is_winning' => false]);
-
-        // Update auction current price and total bids
-        $auction->update([
-            'current_price' => $request->amount,
-            'total_bids' => $auction->total_bids + 1,
-        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'تم تقديم المزايدة بنجاح!',
-            'data' => $bid->load('user'),
+            'data'    => new BidResource($bid->load('user')),
         ], 201);
     }
 
     /**
-     * Get user's bids
+     * Get the authenticated user's bids.
      */
-    public function myBids(Request $request)
+    public function myBids(Request $request): JsonResponse
     {
         $bids = Bid::where('user_id', $request->user()->id)
             ->with(['auction.product'])
@@ -84,17 +92,18 @@ class BidController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $bids,
+            'data'    => BidResource::collection($bids)->response()->getData(true),
         ]);
     }
 
     /**
-     * Get bids for a specific auction
+     * Get bids for a specific auction (public).
      */
-    public function auctionBids($auctionId)
+    public function auctionBids(int $auctionId): JsonResponse
     {
-        $auction = Auction::findOrFail($auctionId);
-        
+        // Verify auction exists
+        Auction::findOrFail($auctionId);
+
         $bids = Bid::where('auction_id', $auctionId)
             ->with('user:id,first_name,last_name')
             ->latest()
@@ -102,7 +111,7 @@ class BidController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $bids,
+            'data'    => BidResource::collection($bids)->response()->getData(true),
         ]);
     }
 }

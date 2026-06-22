@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Auction;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SellerController extends Controller
 {
@@ -33,9 +33,10 @@ class SellerController extends Controller
                 'data' => $orders,
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller getOrders error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحميل الطلبات: ' . $e->getMessage(),
+                'message' => 'فشل تحميل الطلبات.',
             ], 500);
         }
     }
@@ -68,9 +69,10 @@ class SellerController extends Controller
                 'data' => $order,
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller updateOrderStatus error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحديث الطلب: ' . $e->getMessage(),
+                'message' => 'فشل تحديث الطلب.',
             ], 500);
         }
     }
@@ -83,37 +85,40 @@ class SellerController extends Controller
         try {
             $sellerId = $request->user()->id;
 
-            // Total products
+            // Total products and auctions counts
             $totalProducts = Product::where('seller_id', $sellerId)->count();
-
-            // Total auctions
             $totalAuctions = Auction::where('seller_id', $sellerId)->count();
-
-            // Active auctions
             $activeAuctions = Auction::where('seller_id', $sellerId)
                 ->where('status', 'active')
                 ->count();
 
-            // Total orders
-            $totalOrders = Order::whereHas('product', function ($query) use ($sellerId) {
-                $query->where('seller_id', $sellerId);
-            })->count();
-
-            // Total revenue
-            $totalRevenue = Order::whereHas('product', function ($query) use ($sellerId) {
+            // Combined orders query to prevent N+1 / query duplication
+            $orderSummary = Order::whereHas('product', function ($query) use ($sellerId) {
                 $query->where('seller_id', $sellerId);
             })
-            ->where('payment_status', 'paid')
-            ->sum('total_amount');
+            ->selectRaw("
+                COUNT(*) as total_orders,
+                SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_revenue
+            ")
+            ->first();
 
-            // Revenue by month (last 6 months) - SQLite compatible
+            $totalOrders = $orderSummary->total_orders ?? 0;
+            $totalRevenue = $orderSummary->total_revenue ?? 0.0;
+
+            // Determine date formatting function based on database driver for portability
+            $driverName = DB::connection()->getDriverName();
+            $monthField = $driverName === 'sqlite' 
+                ? "strftime('%Y-%m', created_at)" 
+                : "DATE_FORMAT(created_at, '%Y-%m')";
+
+            // Revenue by month (last 6 months)
             $revenueByMonth = Order::whereHas('product', function ($query) use ($sellerId) {
                 $query->where('seller_id', $sellerId);
             })
-            ->where('payment_status', 'paid')
+            ->where('payment_status', 'completed')
             ->where('created_at', '>=', now()->subMonths(6))
             ->select(
-                DB::raw("strftime('%Y-%m', created_at) as month"),
+                DB::raw("{$monthField} as month"),
                 DB::raw('SUM(total_amount) as revenue')
             )
             ->groupBy('month')
@@ -134,15 +139,16 @@ class SellerController extends Controller
                     'total_auctions' => $totalAuctions,
                     'active_auctions' => $activeAuctions,
                     'total_orders' => $totalOrders,
-                    'total_revenue' => $totalRevenue,
+                    'total_revenue' => floatval($totalRevenue),
                     'revenue_by_month' => $revenueByMonth,
                     'top_products' => $topProducts,
                 ],
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller getStatistics error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحميل الإحصائيات: ' . $e->getMessage(),
+                'message' => 'فشل تحميل الإحصائيات.',
             ], 500);
         }
     }
@@ -155,45 +161,50 @@ class SellerController extends Controller
         try {
             $sellerId = $request->user()->id;
 
-            // Get platform commission rate from settings
-            $commissionRate = 10; // Default 10%, should be from settings
+            // Get platform commission rate from settings (default 10%)
+            $commissionRate = 10;
 
-            // Total earnings (from paid orders)
-            $totalEarnings = Order::whereHas('product', function ($query) use ($sellerId) {
+            // Combined orders earnings query to prevent multiple queries
+            $earningsSummary = Order::whereHas('product', function ($query) use ($sellerId) {
                 $query->where('seller_id', $sellerId);
             })
-            ->where('payment_status', 'paid')
-            ->sum('total_amount');
+            ->selectRaw("
+                SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_earnings,
+                SUM(CASE WHEN payment_status = 'pending' THEN total_amount ELSE 0 END) as pending_payments
+            ")
+            ->first();
+
+            $totalEarnings = $earningsSummary->total_earnings ?? 0.0;
+            $pendingPayments = $earningsSummary->pending_payments ?? 0.0;
 
             // Calculate commission
             $commission = $totalEarnings * ($commissionRate / 100);
             $netEarnings = $totalEarnings - $commission;
 
-            // Pending payments (orders not yet paid)
-            $pendingPayments = Order::whereHas('product', function ($query) use ($sellerId) {
-                $query->where('seller_id', $sellerId);
-            })
-            ->where('payment_status', 'pending')
-            ->sum('total_amount');
-
             // Payment history (recent transactions)
             $paymentHistory = Order::whereHas('product', function ($query) use ($sellerId) {
                 $query->where('seller_id', $sellerId);
             })
-            ->where('payment_status', 'paid')
+            ->where('payment_status', 'completed')
             ->with('product')
             ->latest()
             ->limit(20)
             ->get();
 
-            // Earnings by period - SQLite compatible
+            // Determine date formatting function based on database driver for portability
+            $driverName = DB::connection()->getDriverName();
+            $monthField = $driverName === 'sqlite' 
+                ? "strftime('%Y-%m', created_at)" 
+                : "DATE_FORMAT(created_at, '%Y-%m')";
+
+            // Earnings by period
             $earningsByMonth = Order::whereHas('product', function ($query) use ($sellerId) {
                 $query->where('seller_id', $sellerId);
             })
-            ->where('payment_status', 'paid')
+            ->where('payment_status', 'completed')
             ->where('created_at', '>=', now()->subMonths(12))
             ->select(
-                DB::raw("strftime('%Y-%m', created_at) as month"),
+                DB::raw("{$monthField} as month"),
                 DB::raw('SUM(total_amount) as earnings')
             )
             ->groupBy('month')
@@ -203,19 +214,20 @@ class SellerController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'total_earnings' => $totalEarnings,
-                    'commission' => $commission,
+                    'total_earnings' => floatval($totalEarnings),
+                    'commission' => floatval($commission),
                     'commission_rate' => $commissionRate,
-                    'net_earnings' => $netEarnings,
-                    'pending_payments' => $pendingPayments,
+                    'net_earnings' => floatval($netEarnings),
+                    'pending_payments' => floatval($pendingPayments),
                     'payment_history' => $paymentHistory,
                     'earnings_by_month' => $earningsByMonth,
                 ],
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller getEarnings error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحميل الأرباح: ' . $e->getMessage(),
+                'message' => 'فشل تحميل الأرباح.',
             ], 500);
         }
     }
@@ -233,9 +245,10 @@ class SellerController extends Controller
                 'data' => $user,
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller getProfile error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحميل الملف الشخصي: ' . $e->getMessage(),
+                'message' => 'فشل تحميل الملف الشخصي.',
             ], 500);
         }
     }
@@ -265,9 +278,10 @@ class SellerController extends Controller
                 'data' => $user,
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller updateProfile error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحديث الملف الشخصي: ' . $e->getMessage(),
+                'message' => 'فشل تحديث الملف الشخصي.',
             ], 500);
         }
     }
@@ -285,19 +299,20 @@ class SellerController extends Controller
             ]);
 
             $user = $request->user();
-            
-            // Store settings in user meta or separate table
-            // For now, we'll just return success
-            // You can implement this based on your database structure
+            $user->update([
+                'settings' => array_merge($user->settings ?? [], $validated)
+            ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'تم تحديث الإعدادات بنجاح!',
+                'data' => $user->settings,
             ]);
         } catch (\Exception $e) {
+            Log::error('Seller updateSettings error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'فشل تحديث الإعدادات: ' . $e->getMessage(),
+                'message' => 'فشل تحديث الإعدادات.',
             ], 500);
         }
     }
