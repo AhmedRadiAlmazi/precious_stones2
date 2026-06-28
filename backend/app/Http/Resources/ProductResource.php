@@ -21,6 +21,7 @@ class ProductResource extends JsonResource
             'images'         => $this->images ?? [],
             'is_featured'    => $this->is_featured,
             'is_active'      => $this->is_active,
+            'promotion_status' => $this->promotion_status ?? 'none',
             'views_count'    => $this->views_count,
             'seller'         => new UserResource($this->whenLoaded('seller')),
             'category'       => new CategoryResource($this->whenLoaded('category')),

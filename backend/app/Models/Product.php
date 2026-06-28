@@ -23,6 +23,7 @@ class Product extends Model
         'images',
         'is_featured',
         'is_active',
+        'promotion_status',
         'views_count',
     ];
 

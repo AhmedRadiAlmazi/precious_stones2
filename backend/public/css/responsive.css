@@ -438,7 +438,7 @@ img {
    الوضع الداكن والفاتح المتجاوب
    =================================== */
 
-.light-theme {
+:root {
     --bg-primary: #f8fafc;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f1f5f9;
@@ -447,25 +447,13 @@ img {
     --border-color: #e2e8f0;
 }
 
-.dark-theme {
+:root.dark {
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
     --bg-tertiary: #334155;
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
     --border-color: #475569;
-}
-
-/* تكييف الألوان حسب تفضيلات النظام */
-@media (prefers-color-scheme: dark) {
-    :root:not(.light-theme) {
-        --bg-primary: #0f172a;
-        --bg-secondary: #1e293b;
-        --bg-tertiary: #334155;
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --border-color: #475569;
-    }
 }
 
 /* ===================================

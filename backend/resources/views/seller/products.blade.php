@@ -147,6 +147,25 @@
                         </div>
                     </div>
 
+                    <div class="flex items-center justify-between mb-3 text-xs border-t border-color pt-2">
+                        <span class="text-secondary font-semibold">حالة الترويج:</span>
+                        <span class="px-2 py-0.5 rounded font-bold ${
+                            product.promotion_status === 'approved' 
+                                ? 'bg-green-500 bg-opacity-20 text-green-500' 
+                                : product.promotion_status === 'pending'
+                                ? 'bg-yellow-500 bg-opacity-20 text-yellow-500'
+                                : product.promotion_status === 'rejected'
+                                ? 'bg-red-500 bg-opacity-20 text-red-500'
+                                : 'bg-gray-500 bg-opacity-20 text-secondary'
+                        }">
+                            ${
+                                product.promotion_status === 'approved' ? 'مروج' :
+                                product.promotion_status === 'pending' ? 'قيد المراجعة' :
+                                product.promotion_status === 'rejected' ? 'مرفوض' : 'غير مروج'
+                            }
+                        </span>
+                    </div>
+
                     <div class="flex gap-2 pt-3 border-t border-color">
                         <button onclick="toggleProductStatus(${product.id})" 
                             class="flex-1 text-sm px-3 py-2 rounded ${product.is_active ? 'bg-red-500 text-red-500' : 'bg-green-500 text-green-500'} bg-opacity-20 hover:bg-opacity-30 transition"
@@ -163,6 +182,13 @@
                             title="حذف">
                             <i class="fas fa-trash"></i>
                         </button>
+                        ${product.promotion_status === 'none' || product.promotion_status === 'rejected' ? `
+                        <button onclick="promoteProduct(${product.id})" 
+                            class="flex-1 text-sm px-3 py-2 rounded bg-gold bg-opacity-20 hover:bg-opacity-30 text-gold transition"
+                            title="طلب ترويج للمنتج (تكلفة الإعلان: 50 ر.س)">
+                            <i class="fas fa-ad"></i> ترويج
+                        </button>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -187,6 +213,18 @@
             loadProducts();
         } catch (error) {
             ui.showError(error.message || 'فشل حذف المنتج');
+        }
+    }
+
+    async function promoteProduct(id) {
+        if (!confirm('هل أنت متأكد من طلب الترويج لهذا المنتج؟ سيتم خصم 50 ر.س من رصيد محفظتك كرسوم إعلان.')) return;
+        try {
+            const response = await api.promoteProduct(id);
+            ui.showSuccess('تم إرسال طلب الترويج بنجاح إلى الإدارة وسيتم خصم الرسوم بعد الموافقة أو حجزها.');
+            loadProducts();
+        } catch (error) {
+            console.error('Promotion error:', error);
+            ui.showError(error.message || 'فشل إرسال طلب الترويج. يرجى التأكد من وجود رصيد كافٍ في المحفظة.');
         }
     }
 

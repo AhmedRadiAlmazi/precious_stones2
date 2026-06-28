@@ -22,8 +22,8 @@ class UserResource extends JsonResource
             'avatar'       => $this->avatar,
             'settings'     => $this->settings,
             'wallet_balance' => $this->wallet_balance,
-            'roles'        => $this->whenLoaded('roles', fn() => $this->roles->pluck('name')),
-            'permissions'  => $this->whenLoaded('permissions', fn() => $this->permissions->pluck('name')),
+            'roles'        => $this->relationLoaded('roles') ? $this->roles->map(fn($r) => ['name' => $r->name]) : [],
+            'permissions'  => $this->relationLoaded('permissions') ? $this->permissions->map(fn($p) => ['name' => $p->name]) : [],
             'created_at'   => $this->created_at?->toISOString(),
             // NOTE: password, remember_token are never included
         ];

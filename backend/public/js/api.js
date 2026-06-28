@@ -169,6 +169,24 @@ const api = {
         return await this.request('/my-products');
     },
 
+    async promoteProduct(id) {
+        return await this.request(`/products/${id}/promote`, {
+            method: 'POST'
+        });
+    },
+
+    async approvePromotion(id) {
+        return await this.request(`/admin/products/${id}/approve-promotion`, {
+            method: 'POST'
+        });
+    },
+
+    async rejectPromotion(id) {
+        return await this.request(`/admin/products/${id}/reject-promotion`, {
+            method: 'POST'
+        });
+    },
+
     // Auction APIs
     async getAuctions(params = {}) {
         const queryString = new URLSearchParams(params).toString();

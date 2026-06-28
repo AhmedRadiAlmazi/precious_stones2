@@ -71,6 +71,7 @@ class AdminProductController extends Controller
             'certification'  => 'sometimes|string|max:255',
             'is_featured'    => 'sometimes|boolean',
             'is_active'      => 'sometimes|boolean',
+            'promotion_status' => 'sometimes|string|in:none,pending,approved,rejected',
         ]);
 
         $product->update($validated);
@@ -116,6 +117,63 @@ class AdminProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => $product->is_active ? 'تم تفعيل المنتج!' : 'تم إلغاء تفعيل المنتج!',
+            'data'    => new ProductResource($product),
+        ]);
+    }
+
+    /**
+     * Approve promotion request.
+     */
+    public function approvePromotion(int $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        
+        if ($product->promotion_status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'المنتج ليس لديه طلب ترويج معلق حالياً.',
+            ], 400);
+        }
+
+        $product->update([
+            'is_featured' => true,
+            'promotion_status' => 'approved',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تمت الموافقة على طلب الترويج بنجاح وتفعيل الإعلان للمنتج!',
+            'data'    => new ProductResource($product),
+        ]);
+    }
+
+    /**
+     * Reject promotion request (Refunds the fee to seller's wallet).
+     */
+    public function rejectPromotion(int $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        
+        if ($product->promotion_status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'المنتج ليس لديه طلب ترويج معلق حالياً.',
+            ], 400);
+        }
+
+        $product->update([
+            'promotion_status' => 'rejected',
+        ]);
+
+        // Refund the seller's wallet balance
+        $seller = $product->seller;
+        if ($seller) {
+            $seller->increment('wallet_balance', 50.00);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم رفض طلب الترويج وإعادة مبلغ 50 ر.س لمحفظة البائع بنجاح.',
             'data'    => new ProductResource($product),
         ]);
     }

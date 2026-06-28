@@ -167,19 +167,49 @@
     <section class="relative py-20 md:py-32 overflow-hidden bg-tertiary flex items-center min-h-[500px]">
         <!-- الخلفيات المتحركة (Slideshow) -->
         <div class="absolute inset-0 z-0">
-            <div class="hero-slide absolute inset-0 opacity-100 transition-opacity duration-1000 ease-in-out bg-cover bg-center" style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/ألماس وردي نادر من جنوب أفريقيا.jpeg') }}');"></div>
-            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/زمرد كولومبي نقي عالي الجودة.jpeg') }}');"></div>
-            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/ياقوت أزرق نادر.jpeg') }}');"></div>
+            <div class="hero-slide absolute inset-0 opacity-100 transition-opacity duration-1000 ease-in-out bg-cover bg-center" 
+                 data-badge="💎 مزادات موثقة وشهادات GIA"
+                 data-title="سوق الألماس الفاخر والمضمون" 
+                 data-subtitle="مزادات حية لأندر قطع الألماس الوردي والملون بشهادات توثيق دولية معتمدة."
+                 style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/pink_diamond_hero.png') }}');"></div>
+            
+            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" 
+                 data-badge="🟢 ضمان وأمان كامل للمشتري"
+                 data-title="أندر الزمرد الكولومبي النقي" 
+                 data-subtitle="قطع حصرية من قلب كولومبيا بنقاء استثنائي وضمان مالي محمي عبر الحساب الوسيط."
+                 style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/colombian_emerald_hero.png') }}');"></div>
+            
+            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" 
+                 data-badge="💙 شحن مؤمن وتوصيل سريع"
+                 data-title="ياقوت أزرق سريلانكي ساحر" 
+                 data-subtitle="اقتنِ الفخامة بقطع الياقوت الملكي الأزرق مع خدمة شحن مؤمن بالكامل وتوصيل لباب منزلك."
+                 style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/blue_sapphire_hero.png') }}');"></div>
+            
+            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" 
+                 data-badge="🔴 فحص وتدقيق من خبراء الجيولوجيا"
+                 data-title="ياقوت بورمي بلون دم الحمام" 
+                 data-subtitle="قطع استثنائية تم فحصها بدقة وتوثيقها لتضمن لك أعلى درجات الأصالة والاستثمار الآمن."
+                 style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/burmese_ruby_hero.png') }}');"></div>
+            
+            <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center" 
+                 data-badge="✨ قطع فريدة لا تتكرر"
+                 data-title="العقيق والـأوبال الناري النادر" 
+                 data-subtitle="استكشف سحر الطبيعة بألوان نارية ساحرة تعزز مجموعتك الفريدة من الأحجار الكريمة الحصرية."
+                 style="background-image: linear-gradient(to left, rgba(8,8,16,0.85), rgba(8,8,16,0.4)), url('{{ asset('imges/black_opal_hero.png') }}');"></div>
         </div>
 
         <div class="particles-container" id="particles-container"></div>
-        
+
         <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
-        
+
         <div class="relative z-20 container mx-auto px-4">
             <div class="max-w-2xl text-right">
-                <h1 class="text-3xl md:text-5xl font-bold mb-4 gold-text leading-tight">اكتشف عالم الأحجار النادرة</h1>
-                <p class="text-lg md:text-xl mb-8 text-white opacity-95">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة</p>
+                <div id="hero-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 transition-all duration-500 transform translate-y-0 opacity-100"
+                    style="background:rgba(212,175,55,0.14);border:1px solid rgba(212,175,55,0.3);color:#D4AF37;">
+                    💎 مزادات موثقة وشهادات GIA
+                </div>
+                <h1 id="hero-title" class="text-3xl md:text-5xl font-bold mb-4 gold-text leading-tight transition-all duration-500 transform translate-y-0 opacity-100">سوق الألماس الفاخر والمضمون</h1>
+                <p id="hero-subtitle" class="text-lg md:text-xl mb-8 text-white opacity-95 transition-all duration-500 transform translate-y-0 opacity-100">مزادات حية لأندر قطع الألماس الوردي والملون بشهادات توثيق دولية معتمدة.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-start">
                     <a href="{{ url('/shop') }}" class="gold-gradient text-black text-center font-bold py-3 px-8 rounded-full ripple shine-effect transition transform hover:scale-105">
                         استكشف الآن
@@ -234,7 +264,7 @@
                     <i class="fas fa-arrow-left mr-2"></i>
                 </a>
             </div>
-            
+
             <div id="featured-products-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- سيتم تحميل المنتجات هنا -->
                 <div class="col-span-full text-center py-12">
@@ -264,7 +294,7 @@
                     <i class="fas fa-arrow-left mr-2"></i>
                 </a>
             </div>
-            
+
             <div id="live-auctions-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- سيتم تحميل المزادات هنا -->
                 <div class="col-span-full text-center py-12">
@@ -274,11 +304,33 @@
         </div>
     </section>
 
+    <!-- عرض ترويجي خاص (مجموعة العقيق) -->
+    <section class="container mx-auto px-4 py-8 reveal">
+        <div class="relative overflow-hidden cursor-pointer" style="border-radius:22px;border:1px solid rgba(212,175,55,0.2);min-height:240px;background:linear-gradient(135deg,#0d0a20,#1a0d3a,#0a0d1a);transition:transform .3s ease;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+            <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,8,18,0.95) 42%,rgba(8,8,18,0.35) 100%);z-index:1;"></div>
+            <img src="{{ asset('imges/عقيق ناري استرالي.jpg') }}" alt="عقيق ناري" style="position:absolute;right:0;top:0;width:55%;height:100%;object-fit:cover;">
+            <div style="position:relative;z-index:2;" class="p-10">
+                <div class="text-xs font-bold mb-3" style="color:#D4AF37;letter-spacing:.2em;">✦ عرض الأسبوع ✦</div>
+                <h2 class="text-3xl md:text-4xl font-black text-white mb-3">مجموعة العقيق النادرة<br><span style="color:#D4AF37;">من اليمن وأستراليا</span></h2>
+                <p class="mb-6 max-w-md" style="color:#94a3b8;">أحجار عقيق حصرية بألوان نادرة لا تتكرر. كل حجر قصة وتاريخ وأصالة.</p>
+                <div class="flex items-center gap-4">
+                    <a href="{{ url('/shop') }}" class="px-8 py-3 rounded-full font-bold text-black text-center inline-block" style="background: linear-gradient(135deg, rgb(212, 175, 55), rgb(184, 134, 11)); transition: transform 0.3s; transform: scale(1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        اكتشف المجموعة <i class="fas fa-arrow-left mr-1"></i>
+                    </a>
+                    <div>
+                        <div class="text-2xl font-black" style="color:#D4AF37;">خصم 15%</div>
+                        <div class="text-xs" style="color:#64748b;">لفترة محدودة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- الموردين الموثوقين -->
     <section class="py-16 fade-in">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center gold-text mb-12">الموردين الموثوقين</h2>
-            
+
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                 <!-- مورد 1 -->
                 <div class="flex flex-col items-center">
@@ -295,7 +347,7 @@
                     </div>
                     <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
                 </div>
-                
+
                 <!-- مورد 2 -->
                 <div class="flex flex-col items-center">
                     <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
@@ -311,7 +363,7 @@
                     </div>
                     <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
                 </div>
-                
+
                 <!-- مورد 3 -->
                 <div class="flex flex-col items-center">
                     <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
@@ -327,7 +379,7 @@
                     </div>
                     <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
                 </div>
-                
+
                 <!-- مورد 4 -->
                 <div class="flex flex-col items-center">
                     <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
@@ -343,7 +395,7 @@
                     </div>
                     <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
                 </div>
-                
+
                 <!-- مورد 5 -->
                 <div class="flex flex-col items-center">
                     <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
@@ -359,7 +411,7 @@
                     </div>
                     <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded mt-1">موثق رسمي</span>
                 </div>
-                
+
                 <!-- مورد 6 -->
                 <div class="flex flex-col items-center">
                     <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500 mb-3">
@@ -388,7 +440,7 @@
         (function() {
             const splash = document.getElementById('welcome-splash');
             const isSplashShown = sessionStorage.getItem('jawhara_splash_shown');
-            
+
             if (isSplashShown) {
                 if (splash) {
                     splash.style.display = 'none';
@@ -427,7 +479,7 @@
                 requestAnimationFrame(drawSplash);
             }
             drawSplash();
-            
+
             setTimeout(()=>{
                 sessionStorage.setItem('jawhara_splash_shown', 'true');
                 if (splash) {
@@ -446,21 +498,76 @@
         (function() {
             let currentSlide = 0;
             const slides = document.querySelectorAll('.hero-slide');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSubtitle = document.getElementById('hero-subtitle');
+            const heroBadge = document.getElementById('hero-badge');
+
             if (slides.length === 0) return;
-            
+
+            function updateHeroText(slide) {
+                const title = slide.getAttribute('data-title');
+                const subtitle = slide.getAttribute('data-subtitle');
+                const badge = slide.getAttribute('data-badge');
+
+                // Fade out text
+                if (heroTitle) {
+                    heroTitle.classList.remove('opacity-100', 'translate-y-0');
+                    heroTitle.classList.add('opacity-0', 'translate-y-2');
+                }
+                if (heroSubtitle) {
+                    heroSubtitle.classList.remove('opacity-100', 'translate-y-0');
+                    heroSubtitle.classList.add('opacity-0', 'translate-y-2');
+                }
+                if (heroBadge) {
+                    heroBadge.classList.remove('opacity-100', 'translate-y-0');
+                    heroBadge.classList.add('opacity-0', 'translate-y-2');
+                }
+
+                // Wait for fade out to complete, then update and fade in
+                setTimeout(() => {
+                    if (heroTitle && title) heroTitle.textContent = title;
+                    if (heroSubtitle && subtitle) heroSubtitle.textContent = subtitle;
+                    if (heroBadge && badge) {
+                        heroBadge.innerHTML = badge;
+                        heroBadge.style.display = 'inline-flex';
+                    } else if (heroBadge) {
+                        heroBadge.style.display = 'none';
+                    }
+
+                    // Fade in text
+                    if (heroTitle) {
+                        heroTitle.classList.remove('opacity-0', 'translate-y-2');
+                        heroTitle.classList.add('opacity-100', 'translate-y-0');
+                    }
+                    if (heroSubtitle) {
+                        heroSubtitle.classList.remove('opacity-0', 'translate-y-2');
+                        heroSubtitle.classList.add('opacity-100', 'translate-y-0');
+                    }
+                    if (heroBadge && badge) {
+                        heroBadge.classList.remove('opacity-0', 'translate-y-2');
+                        heroBadge.classList.add('opacity-100', 'translate-y-0');
+                    }
+                }, 400);
+            }
+
+            // Set initial slide text
+            updateHeroText(slides[currentSlide]);
+
             setInterval(() => {
                 slides[currentSlide].classList.remove('opacity-100');
                 slides[currentSlide].classList.add('opacity-0');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.remove('opacity-0');
                 slides[currentSlide].classList.add('opacity-100');
-            }, 5000); // Change image every 5 seconds
+
+                updateHeroText(slides[currentSlide]);
+            }, 6000); // Change image every 6 seconds
         })();
 
         // --- تأثيرات الجسيمات والتأثيرات الحركية ---
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
-            
+
             const rippleButtons = document.querySelectorAll('.ripple');
             rippleButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
@@ -469,7 +576,7 @@
                     audio.play().catch(() => {});
                 });
             });
-            
+
             // زر العودة لأعلى
             const backToTopButton = document.createElement('button');
             backToTopButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
@@ -497,21 +604,21 @@
             const container = document.getElementById('particles-container');
             if(!container) return;
             const particleCount = 30;
-            
+
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
-                
+
                 const size = Math.random() * 5 + 2;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 particle.style.left = `${Math.random() * 100}%`;
                 particle.style.top = `${Math.random() * 100}%`;
                 particle.style.opacity = Math.random() * 0.5 + 0.1;
-                
+
                 const duration = Math.random() * 20 + 10;
                 particle.style.animation = `float ${duration}s linear infinite`;
-                
+
                 const keyframes = `
                 @keyframes float {
                     0% { transform: translate(0, 0) rotate(0deg); }
@@ -520,7 +627,7 @@
                     75% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(270deg); }
                     100% { transform: translate(0, 0) rotate(360deg); }
                 }`;
-                
+
                 const styleSheet = document.createElement('style');
                 styleSheet.textContent = keyframes;
                 document.head.appendChild(styleSheet);
@@ -548,12 +655,12 @@
                 const total = end - now;
 
                 if (total <= 0) return 'منتهي';
-                
+
                 const seconds = Math.floor((total / 1000) % 60);
                 const minutes = Math.floor((total / 1000 / 60) % 60);
                 const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
                 const days = Math.floor(total / (1000 * 60 * 60 * 24));
-                
+
                 const s = seconds < 10 ? '0' + seconds : seconds;
                 const m = minutes < 10 ? '0' + minutes : minutes;
                 const h = hours < 10 ? '0' + hours : hours;
@@ -587,7 +694,7 @@
                     if (endTime) {
                         const text = formatTimeRemaining(endTime);
                         timer.innerText = text;
-                        
+
                         if (text === 'منتهي') {
                             timer.classList.remove('text-yellow-500', 'text-white');
                             timer.classList.add('text-red-500', 'font-bold');
@@ -610,17 +717,17 @@
                 const adsResponse = await api.getProducts({ is_featured: 1, limit: 12 });
                 const allAds = adsResponse.data?.data || adsResponse.data || [];
                 const activeAds = allAds.filter(p => p.is_active);
-                
+
                 const ltrContainer = document.getElementById('ads-ltr-container');
                 const rtlContainer = document.getElementById('ads-rtl-container');
-                
+
                 if (activeAds.length > 0) {
                     let displayAds = [...activeAds];
                     // Ensure we have enough items for continuous carousel scrolling
                     while (displayAds.length < 12) {
                         displayAds = [...displayAds, ...activeAds];
                     }
-                    
+
                     // LTR ads
                     ltrContainer.innerHTML = displayAds.map(product => {
                         const img = product.images && product.images.length > 0 ? getImageUrl(product.images[0]) : '{{ asset("imges/ياقوت أزرق نادر.jpeg") }}';
@@ -636,7 +743,7 @@
                         </a>
                         `;
                     }).join('');
-                    
+
                     // RTL ads (reversed for variety)
                     const displayAdsRtl = [...displayAds].reverse();
                     rtlContainer.innerHTML = displayAdsRtl.map(product => {
@@ -667,10 +774,10 @@
 
             // 1. جلب المنتجات المميزة
             try {
-                const productsResponse = await api.getProducts({ page: 1, limit: 4 }); 
-                const products = productsResponse.data?.data || productsResponse.data || []; 
+                const productsResponse = await api.getProducts({ page: 1, limit: 4 });
+                const products = productsResponse.data?.data || productsResponse.data || [];
                 const productsContainer = document.getElementById('featured-products-container');
-                
+
                 if (products.length > 0) {
                     productsContainer.innerHTML = products.map(product => {
                         const img = product.images && product.images.length > 0 ? getImageUrl(product.images[0]) : '{{ asset("imges/ياقوت أزرق نادر.jpeg") }}';
@@ -689,7 +796,7 @@
                                     <span class="text-yellow-500 font-bold">${parseFloat(product.price).toLocaleString()} ر.س</span>
                                     <span class="text-secondary text-sm">${product.country || 'غير محدد'}</span>
                                 </div>
-                                <button onclick="window.location.href='{{ url("/shop") }}?id=${product.id}'" 
+                                <button onclick="window.location.href='{{ url("/shop") }}?id=${product.id}'"
                                     class="w-full bg-tertiary hover:bg-opacity-80 text-primary py-2 rounded-lg transition border border-color">
                                     عرض التفاصيل
                                 </button>
@@ -741,8 +848,8 @@
                         const btnText = isExpired ? 'انتهى المزاد' : 'زايد الآن';
                         const countdownDisplay = isExpired ? '<span class="text-red-500 font-bold">منتهي</span>' : `<span class="countdown-flash dir-ltr" data-end-time="${auction.end_time}">${formatTimeRemaining(auction.end_time)}</span>`;
 
-                        const imgUrl = auction.product && auction.product.images && auction.product.images.length > 0 
-                                     ? getImageUrl(auction.product.images[0]) 
+                        const imgUrl = auction.product && auction.product.images && auction.product.images.length > 0
+                                     ? getImageUrl(auction.product.images[0])
                                      : '{{ asset("imges/عقيق نادر من اليمن.jpeg") }}';
 
                         return `
@@ -777,7 +884,7 @@
                             </div>
                         </div>
                     `}).join('');
-                    
+
                     startCountdownTimers();
                 } else {
                     auctionsContainer.innerHTML = '<p class="text-center col-span-full text-secondary">لا توجد مزادات نشطة حالياً</p>';

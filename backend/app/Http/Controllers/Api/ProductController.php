@@ -209,4 +209,58 @@ class ProductController extends Controller
             'data'    => ProductResource::collection($products)->response()->getData(true),
         ]);
     }
+
+    /**
+     * Promote a product (Seller pays 50 S.R. from wallet to submit promotion request).
+     */
+    public function promote(Request $request, int $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        $user = $request->user();
+
+        // Check if the user owns the product
+        if ($product->seller_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'غير مصرح لك بترويج هذا المنتج.',
+            ], 403);
+        }
+
+        // Check if already promoted or pending
+        if ($product->promotion_status === 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا المنتج لديه طلب ترويج قيد الانتظار بالفعل.',
+            ], 400);
+        }
+
+        if ($product->promotion_status === 'approved' && $product->is_featured) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا المنتج مروج له ونشط حالياً في الإعلانات.',
+            ], 400);
+        }
+
+        $promotionFee = 50.00;
+
+        // Check wallet balance
+        if ($user->wallet_balance < $promotionFee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'رصيد محفظتك غير كافٍ. رسوم الترويج هي 50 ر.س.',
+            ], 400);
+        }
+
+        // Deduct fee and update product status
+        $user->decrement('wallet_balance', $promotionFee);
+        $product->update([
+            'promotion_status' => 'pending',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تقديم طلب الترويج بنجاح وخصم 50 ر.س من محفظتك. قيد المراجعة الآن من قبل الإدارة.',
+            'new_balance' => (float)$user->fresh()->wallet_balance,
+        ]);
+    }
 }

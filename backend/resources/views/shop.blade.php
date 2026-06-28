@@ -101,8 +101,14 @@
         border-top: 1px solid rgba(212,175,55,0.12);
         border-bottom: 1px solid rgba(212,175,55,0.12);
     }
-    .stat-sep { border-right: 1px solid rgba(212,175,55,0.1); }
-    .stat-sep:last-child { border-right: none; }
+    @media (min-width: 768px) {
+        .stat-sep {
+            border-left: 1px solid rgba(212,175,55,0.1) !important;
+        }
+        .stat-sep:last-child {
+            border-left: none !important;
+        }
+    }
 
     /* ===== PROMO BANNERS ===== */
     .promo-card {
@@ -128,6 +134,12 @@
     .filter-sidebar {
         background: linear-gradient(180deg, #0f0f1a, #0b0b15);
         border: 1px solid var(--border-gold); border-radius: 20px;
+    }
+    @media (min-width: 768px) {
+        #filter-sidebar {
+            position: sticky;
+            top: 120px;
+        }
     }
 
     /* ===== PRODUCT CARDS ===== */
@@ -249,6 +261,77 @@
 
     /* ===== OVERRIDE LAYOUT BG ===== */
     footer { display: none !important; } /* hide the layout footer, we add our own */
+
+    /* ===== RESPONSIVE ADJUSTMENTS ===== */
+    @media (max-width: 1024px) {
+        /* Hide floating gems to prevent overlap with content on smaller screens */
+        .gf {
+            display: none !important;
+        }
+        /* Adjust hero minimum height and padding */
+        .shop-hero {
+            min-height: auto;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+        /* Align and scale down hero elements */
+        #hero-gallery {
+            margin-top: 20px;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        /* Stats strip borders responsive */
+        .stat-sep {
+            border-right: none !important;
+            border-left: none !important;
+            border-bottom: 1px solid rgba(212,175,55,0.1);
+        }
+        .stat-sep:nth-child(odd) {
+            border-left: 1px solid rgba(212,175,55,0.1) !important;
+        }
+        .stat-sep:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+
+        /* Promo card adjustments */
+        .promo-card {
+            height: auto !important;
+            min-height: 200px;
+        }
+        .promo-card div[style*="padding:30px"] {
+            padding: 20px !important;
+        }
+        .promo-card h3 {
+            font-size: 1.25rem !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        /* Mobile stats strip text scaling */
+        .stats-strip {
+            padding: 10px 0 !important;
+        }
+        .stat-sep {
+            padding: 8px 4px !important;
+        }
+        .stat-sep .text-xl {
+            font-size: 1rem !important;
+        }
+        .stat-sep .text-xs {
+            font-size: 0.65rem !important;
+        }
+
+        /* Hide scrollbar for category pills scroll */
+        #cat-pills-bar::-webkit-scrollbar {
+            display: none !important;
+        }
+        #cat-pills-bar {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+    }
 </style>
 @endsection
 
@@ -448,7 +531,7 @@
     <div class="flex flex-col md:flex-row gap-8">
 
         {{-- Filter Sidebar --}}
-        <aside id="filter-sidebar" class="filter-sidebar md:w-60 lg:w-64 p-5 self-start" style="position:sticky;top:120px;">
+        <aside id="filter-sidebar" class="filter-sidebar md:w-60 lg:w-64 p-5 self-start">
             <div class="flex justify-between items-center mb-5">
                 <h2 class="font-black text-lg" style="color:#D4AF37;">تصفية المنتجات</h2>
                 <button id="close-sidebar-btn" class="md:hidden" style="color:#64748b;"><i class="fas fa-times"></i></button>
@@ -550,7 +633,7 @@
 </section>
 
 {{-- ===== CUSTOM FOOTER ===== --}}
-<footer style="background:linear-gradient(180deg,#080810,#04040a);border-top:1px solid rgba(212,175,55,0.1);" class="py-14">
+<footer class="bg-secondary py-14 border-t border-color">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
             <div>
@@ -558,31 +641,31 @@
                     <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,#D4AF37,#B8860B);">
                         <i class="fas fa-gem text-black"></i>
                     </div>
-                    <span class="text-xl font-black" style="color:#D4AF37;">جوهرة</span>
+                    <span class="text-xl font-black gold-text">جوهرة</span>
                 </div>
-                <p class="text-sm leading-relaxed" style="color:#64748b;">المنصة الرائدة لتداول الأحجار الكريمة الفاخرة بضمان الأصالة والجودة العالمية.</p>
+                <p class="text-sm leading-relaxed text-secondary">المنصة الرائدة لتداول الأحجار الكريمة الفاخرة بضمان الأصالة والجودة العالمية.</p>
             </div>
             <div>
-                <h4 class="font-bold text-white mb-4">المتجر</h4>
-                <ul class="space-y-2 text-sm" style="color:#64748b;">
+                <h4 class="font-bold gold-text mb-4">المتجر</h4>
+                <ul class="space-y-2 text-sm text-secondary">
                     <li><a href="{{ url('/shop') }}" style="transition:color .3s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color=''">جميع المنتجات</a></li>
                     <li><a href="{{ url('/auctions') }}" style="transition:color .3s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color=''">المزادات النشطة</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="font-bold text-white mb-4">الدعم</h4>
-                <ul class="space-y-2 text-sm" style="color:#64748b;">
+                <h4 class="font-bold gold-text mb-4">الدعم</h4>
+                <ul class="space-y-2 text-sm text-secondary">
                     <li><a href="#" style="transition:color .3s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color=''">تواصل معنا</a></li>
                     <li><a href="#" style="transition:color .3s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color=''">الأسئلة الشائعة</a></li>
                     <li><a href="#" style="transition:color .3s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color=''">سياسة الإرجاع</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="font-bold text-white mb-4">النشرة البريدية</h4>
-                <p class="text-sm mb-3" style="color:#64748b;">اشترك لتلقي أحدث العروض والأحجار النادرة.</p>
+                <h4 class="font-bold gold-text mb-4">النشرة البريدية</h4>
+                <p class="text-sm mb-3 text-secondary">اشترك لتلقي أحدث العروض والأحجار النادرة.</p>
                 <div class="flex gap-2">
                     <input type="email" placeholder="بريدك الإلكتروني" class="flex-1 rounded-xl py-2.5 px-4 text-sm outline-none"
-                        style="background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.2);color:#e2e8f0;">
+                        style="background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.2);color:var(--text-primary);">
                     <button class="px-4 py-2.5 rounded-xl font-bold text-black text-sm" style="background:linear-gradient(135deg,#D4AF37,#B8860B);">
                         <i class="fas fa-paper-plane"></i>
                     </button>

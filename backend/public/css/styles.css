@@ -667,10 +667,15 @@ body.shop-page {
   to   { transform: translateX(100%);  }
 }
 
-/* Shop-specific header override: hide the layout's light-theme header bg on shop page */
+/* Shop-specific header override: translucent background matching the current theme */
 body.shop-page header.bg-secondary {
-  background: rgba(8,8,16,0.88) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(18px) !important;
+  border-bottom-color: rgba(0,0,0,0.08) !important;
+}
+
+html.dark body.shop-page header.bg-secondary {
+  background: rgba(8,8,16,0.88) !important;
   border-bottom-color: rgba(212,175,55,0.15) !important;
 }
 

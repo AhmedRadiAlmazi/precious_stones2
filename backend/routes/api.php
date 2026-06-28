@@ -73,6 +73,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])
             ->middleware('permission:delete-own-products');
         Route::get('/my-products', [ProductController::class, 'myProducts']);
+        Route::post('/products/{id}/promote', [ProductController::class, 'promote']);
         
         // Auctions
         Route::post('/auctions', [AuctionController::class, 'store'])
@@ -109,6 +110,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::put('/products/{id}', [AdminProductController::class, 'update']);
         Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
         Route::post('/products/{id}/toggle-status', [AdminProductController::class, 'toggleStatus']);
+        Route::post('/products/{id}/approve-promotion', [AdminProductController::class, 'approvePromotion']);
+        Route::post('/products/{id}/reject-promotion', [AdminProductController::class, 'rejectPromotion']);
         
         // Order Management
         Route::get('/orders', [AdminOrderController::class, 'index']);

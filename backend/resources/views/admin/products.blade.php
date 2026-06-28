@@ -51,6 +51,7 @@
                     <th class="px-6 py-4 text-right text-sm font-semibold text-primary whitespace-nowrap">السعر</th>
                     <th class="px-6 py-4 text-right text-sm font-semibold text-primary whitespace-nowrap">المخزون</th>
                     <th class="px-6 py-4 text-right text-sm font-semibold text-primary whitespace-nowrap">الحالة</th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold text-primary whitespace-nowrap">الترويج والإعلان</th>
                     <th class="px-6 py-4 text-right text-sm font-semibold text-primary whitespace-nowrap">الإجراءات</th>
                 </tr>
             </thead>
@@ -140,15 +141,25 @@
                     class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm"></textarea>
             </div>
 
-            <div class="flex gap-4 pt-2">
-                <div class="flex items-center gap-2">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" id="product-featured" class="w-4 h-4 rounded text-gold focus:ring-gold bg-tertiary border-color">
                     <label for="product-featured" class="text-sm text-primary">منتج مميز (Featured)</label>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" id="product-active" class="w-4 h-4 rounded text-gold focus:ring-gold bg-tertiary border-color">
                     <label for="product-active" class="text-sm text-primary">منتج نشط (Active)</label>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-primary mb-1">حالة الترويج والظهور في الإعلانات</label>
+                <select id="product-promotion-status" class="w-full bg-tertiary border border-color rounded-lg py-2 px-3 focus:outline-none focus:border-gold text-primary text-sm">
+                    <option value="none">غير مروج</option>
+                    <option value="pending">قيد المراجعة (طلب ترويج)</option>
+                    <option value="approved">مروج (معلن ومفعل في شريط الإعلانات)</option>
+                    <option value="rejected">مرفوض</option>
+                </select>
             </div>
 
             <div class="flex gap-3 pt-4 border-t border-color mt-6">
@@ -282,6 +293,39 @@
                         ${product.is_active ? 'نشط' : 'غير نشط'}
                     </span>
                 </td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col gap-1 items-start">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                            product.promotion_status === 'approved' 
+                                ? 'bg-green-500 bg-opacity-20 text-green-500' 
+                                : product.promotion_status === 'pending'
+                                ? 'bg-yellow-500 bg-opacity-20 text-yellow-500'
+                                : product.promotion_status === 'rejected'
+                                ? 'bg-red-500 bg-opacity-20 text-red-500'
+                                : 'bg-gray-500 bg-opacity-20 text-secondary'
+                        }">
+                            ${
+                                product.promotion_status === 'approved' ? 'مروج (معلن عنه)' :
+                                product.promotion_status === 'pending' ? 'قيد المراجعة (طلب ترويج)' :
+                                product.promotion_status === 'rejected' ? 'مرفوض' : 'غير مروج'
+                            }
+                        </span>
+                        ${product.promotion_status === 'pending' ? `
+                            <div class="flex gap-1 mt-1">
+                                <button onclick="approveProductPromotion(${product.id})" 
+                                    class="text-xs px-2 py-1 rounded bg-green-500 hover:bg-green-600 text-white transition font-bold"
+                                    title="موافقة على الترويج">
+                                    قبول
+                                </button>
+                                <button onclick="rejectProductPromotion(${product.id})" 
+                                    class="text-xs px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white transition font-bold"
+                                    title="رفض الترويج">
+                                    رفض
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex gap-2">
                         <button onclick="editProduct(${product.id})" 
@@ -369,6 +413,7 @@
         document.getElementById('product-description').value = product.description || '';
         document.getElementById('product-featured').checked = !!product.is_featured;
         document.getElementById('product-active').checked = !!product.is_active;
+        document.getElementById('product-promotion-status').value = product.promotion_status || 'none';
 
         const modal = document.getElementById('product-modal');
         modal.style.display = 'flex';
@@ -394,7 +439,8 @@
             category_id: parseInt(document.getElementById('product-category').value),
             description: document.getElementById('product-description').value,
             is_featured: document.getElementById('product-featured').checked ? 1 : 0,
-            is_active: document.getElementById('product-active').checked ? 1 : 0
+            is_active: document.getElementById('product-active').checked ? 1 : 0,
+            promotion_status: document.getElementById('product-promotion-status').value
         };
 
         try {
@@ -434,6 +480,30 @@
         } catch (error) {
             console.error('Error deleting product:', error);
             ui.showError(error.message || 'فشل حذف المنتج');
+        }
+    }
+
+    async function approveProductPromotion(id) {
+        if (!confirm('هل أنت متأكد من قبول طلب الترويج للمنتج؟ سيتم خصم رسوم الإعلان وتفعيله كمنتج مروج.')) return;
+        try {
+            await api.approvePromotion(id);
+            ui.showSuccess('تم قبول الترويج بنجاح وتفعيل الإعلان!');
+            loadProducts(currentPage);
+        } catch (error) {
+            console.error('Error approving promotion:', error);
+            ui.showError(error.message || 'فشل قبول الترويج');
+        }
+    }
+
+    async function rejectProductPromotion(id) {
+        if (!confirm('هل أنت متأكد من رفض طلب الترويج للمنتج؟ سيتم إعادة رسوم الإعلان المحجوزة إلى محفظة البائع.')) return;
+        try {
+            await api.rejectPromotion(id);
+            ui.showSuccess('تم رفض الترويج وإعادة الرصيد للبائع بنجاح!');
+            loadProducts(currentPage);
+        } catch (error) {
+            console.error('Error rejecting promotion:', error);
+            ui.showError(error.message || 'فشل رفض الترويج');
         }
     }
 

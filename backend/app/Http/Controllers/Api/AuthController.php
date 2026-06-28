@@ -44,7 +44,7 @@ class AuthController extends Controller
                 ? 'تم التسجيل بنجاح. في انتظار موافقة الإدارة.'
                 : 'تم التسجيل بنجاح!',
             'data' => [
-                'user'         => new UserResource($user),
+                'user'         => new UserResource($user->load('roles')),
                 'token'        => $token,
                 'token_type'   => $token ? 'Bearer' : null,
                 'needs_approval' => $request->account_type === 'seller',
