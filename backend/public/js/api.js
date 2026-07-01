@@ -499,6 +499,18 @@ const api = {
             body: JSON.stringify(data),
         });
     },
+
+    // AI Valuation APIs
+    async getAiEstimate(productId) {
+        return await this.request(`/products/${productId}/estimate`);
+    },
+
+    async simulateValuation(inputs) {
+        return await this.request('/valuation/simulate', {
+            method: 'POST',
+            body: JSON.stringify(inputs),
+        });
+    },
 };
 
 // UI Helper Functions

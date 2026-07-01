@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SellerController;
 use App\Http\Controllers\Api\EscrowController;
 use App\Http\Controllers\Api\AiValuationController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\AdminProductController;
 use App\Http\Controllers\Api\Admin\AdminAuctionController;
@@ -30,6 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/recommendations', [AiValuationController::class, 'recommendations']);
     Route::get('/products/{id}/estimate', [AiValuationController::class, 'estimate']);
+    Route::post('/valuation/simulate', [AiValuationController::class, 'simulate']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     
     // Auctions - Public
@@ -51,6 +53,17 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/',                [NotificationController::class, 'index']);
+        Route::get('/unread-count',    [NotificationController::class, 'unreadCount']);
+        Route::put('/read-all',        [NotificationController::class, 'markAllRead']);
+        Route::put('/preferences',     [NotificationController::class, 'savePreferences']);
+        Route::delete('/',             [NotificationController::class, 'destroyAll']);
+        Route::put('/{id}/read',       [NotificationController::class, 'markRead']);
+        Route::delete('/{id}',         [NotificationController::class, 'destroy']);
+    });
+
     // Bids - Buyer & Seller
     Route::post('/bids', [BidController::class, 'store'])
         ->middleware('permission:place-bids');

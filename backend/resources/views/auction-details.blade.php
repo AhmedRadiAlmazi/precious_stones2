@@ -32,6 +32,16 @@
             background: var(--gold);
             border-radius: 3px;
         }
+        /* AI Valuation scanning animations */
+        @keyframes gemRotateAD {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+        @keyframes scanLineAD {
+            0%   { top: 0; opacity: 0.8; }
+            50%  { opacity: 1; }
+            100% { top: 100%; opacity: 0.8; }
+        }
     </style>
 @endsection
 
@@ -199,6 +209,106 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <!-- تقرير التقييم الذكي للمزاد -->
+            <div class="mt-8 bg-secondary border border-color rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <i class="fas fa-robot text-gold"></i>
+                        <span>تقرير تقييم الذكاء الاصطناعي للحجر الكريم</span>
+                    </h3>
+                    <button id="ai-valuation-btn" onclick="loadAiValuation()"
+                        class="gold-gradient text-black font-bold px-5 py-2.5 rounded-xl text-sm hover:shadow-lg transition flex items-center gap-2">
+                        <i class="fas fa-search-dollar"></i>
+                        <span>عرض التقييم الذكي</span>
+                    </button>
+                </div>
+
+                <!-- Initial placeholder -->
+                <div id="ai-initial-state" class="text-center py-8 text-secondary">
+                    <i class="fas fa-gem text-4xl text-gold mb-3 block" style="opacity:0.4"></i>
+                    <p class="text-sm">اضغط على "عرض التقييم الذكي" لتحليل قيمة هذا الحجر باستخدام خوارزمية الذكاء الاصطناعي المبنية على معايير 4 Cs العالمية.</p>
+                </div>
+
+                <!-- AI Loading -->
+                <div id="ai-loading-state" class="hidden text-center py-8">
+                    <div style="position:relative;width:80px;height:80px;margin:0 auto 12px;">
+                        <span style="font-size:4rem;line-height:1;display:block;animation:gemRotateAD 2s linear infinite;filter:drop-shadow(0 0 10px #D4AF37);">💎</span>
+                        <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);animation:scanLineAD 1s linear infinite;box-shadow:0 0 8px #D4AF37;"></div>
+                    </div>
+                    <p class="text-gold font-bold text-sm">جاري فحص خصائص الحجر بالذكاء الاصطناعي...</p>
+                </div>
+
+                <!-- AI Result -->
+                <div id="ai-result-state" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <!-- Quality gauge -->
+                        <div class="bg-tertiary border border-color rounded-xl p-4 flex flex-col items-center">
+                            <div style="position:relative;width:100px;height:100px;">
+                                <svg viewBox="0 0 120 120" width="100" height="100" style="transform:rotate(-90deg)">
+                                    <defs>
+                                        <linearGradient id="adGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#B8860B"/>
+                                            <stop offset="100%" style="stop-color:#F5D76E"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+                                    <circle cx="60" cy="60" r="50" id="ad-gauge-fill" fill="none"
+                                        stroke="url(#adGaugeGrad)" stroke-width="12" stroke-linecap="round"
+                                        stroke-dasharray="314.16" stroke-dashoffset="314.16"
+                                        style="transition:stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)"/>
+                                </svg>
+                                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                                    <span class="text-xl font-black text-gold" id="ad-quality-score">0</span>
+                                    <span class="text-xs text-secondary">/100</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-secondary mt-2 text-center">مؤشر جودة الحجر</p>
+                        </div>
+
+                        <!-- Price range -->
+                        <div class="md:col-span-2 bg-tertiary border border-color rounded-xl p-4">
+                            <p class="text-xs text-secondary mb-3">التقدير السعري (ريال سعودي)</p>
+                            <div class="flex items-center gap-4 mb-3">
+                                <div class="flex-1 text-center bg-secondary rounded-lg p-2">
+                                    <p class="text-xs text-secondary mb-1">الأدنى</p>
+                                    <p class="font-bold text-primary text-sm" id="ad-price-low">--</p>
+                                </div>
+                                <i class="fas fa-arrows-alt-h text-gold"></i>
+                                <div class="flex-1 text-center bg-secondary rounded-lg p-2">
+                                    <p class="text-xs text-secondary mb-1">الأعلى</p>
+                                    <p class="font-bold text-primary text-sm" id="ad-price-high">--</p>
+                                </div>
+                            </div>
+                            <div class="text-center pt-3 border-t border-color">
+                                <p class="text-xs text-secondary mb-1">التقدير الوسطي</p>
+                                <p class="text-2xl font-black text-gold" id="ad-price-mid">--</p>
+                                <p class="text-xs text-secondary">ر.س</p>
+                            </div>
+                            <!-- Comparison with auction -->
+                            <div id="ad-comparison" class="mt-3 pt-3 border-t border-color text-xs text-center hidden">
+                                <span id="ad-comparison-text" class="font-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Factors -->
+                    <div class="bg-tertiary border border-color rounded-xl p-4">
+                        <p class="font-bold text-sm mb-3 flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-gold text-xs"></i>
+                            عوامل التسعير المؤثرة
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="ad-factors-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-secondary text-center mt-3">
+                        <i class="fas fa-info-circle text-gold ml-1"></i>
+                        التقييم تقديري استناداً لمعايير 4 Cs العالمية وهو للإرشاد فقط.
+                        <a href="{{ url('/ai-valuation') }}" class="text-gold hover:underline mr-2">جرّب أداة التقييم الكاملة</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -501,6 +611,133 @@
             }
 
             loadAuctionDetails();
+
+            // ===== AI VALUATION LOGIC =====
+            async function loadAiValuation() {
+                if (!currentAuction) {
+                    alert('يرجى انتظار تحميل بيانات المزاد أولاً.');
+                    return;
+                }
+
+                const btn = document.getElementById('ai-valuation-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري التحليل...</span>';
+
+                document.getElementById('ai-initial-state').classList.add('hidden');
+                document.getElementById('ai-result-state').classList.add('hidden');
+                document.getElementById('ai-loading-state').classList.remove('hidden');
+
+                // Build inputs from auction product data
+                const product  = currentAuction.product || {};
+                const catName  = product.category?.name || 'أحجار كريمة';
+                const carats   = parseFloat(product.weight) || 1.5;
+                const desc     = (product.description || '').toLowerCase();
+                const origin   = product.origin_country || product.country || 'أخرى';
+
+                // Detect clarity from description
+                let clarity = 'vvs';
+                if (desc.includes('flawless') || desc.includes('fl') || desc.includes('if')) clarity = 'fl_if';
+                else if (desc.includes('vs'))  clarity = 'vs';
+                else if (desc.includes('si'))  clarity = 'si';
+
+                // Detect cut
+                let cut = 'excellent';
+                if (desc.includes('very good') || desc.includes('جيد جدا')) cut = 'very_good';
+                else if (desc.includes('good') || desc.includes('جيد'))     cut = 'good';
+                else if (desc.includes('fair') || desc.includes('مقبول'))   cut = 'fair';
+
+                // Color
+                let color = 'd_colorless';
+                if (desc.includes('g-color') || desc.includes('near colorless')) color = 'g_near_colorless';
+                if (desc.includes('fancy') || desc.includes('ملون'))            color = 'fancy_vivid';
+
+                try {
+                    const response = await api.simulateValuation({
+                        category: catName,
+                        carats,
+                        cut,
+                        clarity,
+                        color,
+                        origin,
+                    });
+
+                    await new Promise(r => setTimeout(r, 1200)); // Show loader briefly
+
+                    document.getElementById('ai-loading-state').classList.add('hidden');
+
+                    if (!response || !response.success) throw new Error('فشل التقييم');
+
+                    const d = response.data;
+
+                    // Gauge
+                    document.getElementById('ad-quality-score').textContent = d.quality_score;
+                    setTimeout(() => {
+                        const circ = 314.16;
+                        document.getElementById('ad-gauge-fill').style.strokeDashoffset =
+                            circ - (circ * d.quality_score / 100);
+                    }, 100);
+
+                    // Prices
+                    document.getElementById('ad-price-low').textContent  = Number(d.low_estimate_sar).toLocaleString('ar-SA') + ' ر.س';
+                    document.getElementById('ad-price-high').textContent = Number(d.high_estimate_sar).toLocaleString('ar-SA') + ' ر.س';
+                    document.getElementById('ad-price-mid').textContent  = Number(d.mid_estimate_sar).toLocaleString('ar-SA');
+
+                    // Compare with current auction price
+                    const currentBid = parseFloat(currentAuction.current_price || currentAuction.starting_price);
+                    const sarBid     = currentBid; // already in SAR
+                    const compDiv    = document.getElementById('ad-comparison');
+                    const compText   = document.getElementById('ad-comparison-text');
+                    if (sarBid && d.mid_estimate_sar) {
+                        const ratio = (sarBid / d.mid_estimate_sar) * 100;
+                        compDiv.classList.remove('hidden');
+                        if (ratio < 85) {
+                            compText.className = 'font-bold text-green-500';
+                            compText.innerHTML = `<i class="fas fa-thumbs-up ml-1"></i>سعر المزاد الحالي (${currentBid.toLocaleString('ar-SA')} ر.س) أقل من التقدير بنسبة ${(100-ratio).toFixed(0)}% — فرصة ممتازة!`;
+                        } else if (ratio > 115) {
+                            compText.className = 'font-bold text-red-400';
+                            compText.innerHTML = `<i class="fas fa-exclamation-triangle ml-1"></i>سعر المزاد الحالي أعلى من التقدير بنسبة ${(ratio-100).toFixed(0)}%`;
+                        } else {
+                            compText.className = 'font-bold text-gold';
+                            compText.innerHTML = `<i class="fas fa-balance-scale ml-1"></i>سعر المزاد الحالي ضمن النطاق التقديري — سعر عادل.`;
+                        }
+                    }
+
+                    // Factors grid
+                    const factorLabels = {
+                        cut_multiplier:     { label: 'القطع',   icon: '<i class="fas fa-cut" style="color:#D4AF37;font-size:1.1rem;"></i>' },
+                        clarity_multiplier: { label: 'النقاء',  icon: '<i class="fas fa-microscope" style="color:#818cf8;font-size:1.1rem;"></i>' },
+                        color_multiplier:   { label: 'اللون',   icon: '<i class="fas fa-palette" style="color:#f472b6;font-size:1.1rem;"></i>' },
+                        origin_multiplier:  { label: 'المنشأ',  icon: '<i class="fas fa-map-marker-alt" style="color:#34d399;font-size:1.1rem;"></i>' },
+                    };
+                    const grid = document.getElementById('ad-factors-grid');
+                    grid.innerHTML = '';
+                    Object.entries(d.factors).forEach(([key, val]) => {
+                        const info = factorLabels[key];
+                        if (!info) return;
+                        const color2 = val >= 1.5 ? '#22c55e' : val >= 1.2 ? '#D4AF37' : val >= 1.0 ? '#94a3b8' : '#ef4444';
+                        grid.innerHTML += `
+                            <div class="bg-secondary border border-color rounded-lg p-3 text-center">
+                                <div class="text-xl mb-1">${info.icon}</div>
+                                <div class="text-xs text-secondary mb-1">${info.label}</div>
+                                <div class="font-black text-sm" style="color:${color2}">×${val.toFixed(2)}</div>
+                            </div>`;
+                    });
+
+                    document.getElementById('ai-result-state').classList.remove('hidden');
+
+                } catch(err) {
+                    console.error(err);
+                    document.getElementById('ai-loading-state').classList.add('hidden');
+                    document.getElementById('ai-initial-state').classList.remove('hidden');
+                    alert('حدث خطأ أثناء جلب التقييم: ' + err.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>إعادة التقييم</span>';
+                }
+            }
+
+            // Expose globally
+            window.loadAiValuation = loadAiValuation;
         });
     </script>
 @endsection

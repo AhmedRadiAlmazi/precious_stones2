@@ -7,6 +7,8 @@ Route::view('/', 'welcome');
 Route::view('/shop', 'shop');
 Route::view('/auctions', 'auction');
 Route::view('/auction-details', 'auction-details');
+Route::view('/ai-valuation', 'ai-valuation');
+Route::view('/notifications', 'notifications');
 Route::view('/login', 'auth.login');
 Route::view('/register', 'auth.register');
 

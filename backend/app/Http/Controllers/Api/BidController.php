@@ -21,9 +21,10 @@ class BidController extends Controller
     public function store(StoreBidRequest $request): JsonResponse
     {
         $bid = null;
+        $previousWinnerId = null;
 
         try {
-            DB::transaction(function () use ($request, &$bid) {
+            DB::transaction(function () use ($request, &$bid, &$previousWinnerId) {
                 // Lock the auction row to prevent concurrent bids
                 $auction = Auction::lockForUpdate()->findOrFail($request->auction_id);
 
@@ -42,6 +43,13 @@ class BidController extends Controller
                 if ($request->amount < $minBid) {
                     abort(422, "الحد الأدنى للمزايدة هو {$minBid} ر.س");
                 }
+
+                // Remember who was the previous winner (for outbid notification)
+                $previousWinningBid = Bid::where('auction_id', $auction->id)
+                    ->where('is_winning', true)
+                    ->where('user_id', '!=', $request->user()->id)
+                    ->first();
+                $previousWinnerId = $previousWinningBid?->user_id;
 
                 // Mark all previous bids as non-winning
                 Bid::where('auction_id', $auction->id)->update(['is_winning' => false]);
@@ -69,6 +77,17 @@ class BidController extends Controller
             if ($bid) {
                 $bid->load('user');
                 event(new \App\Events\BidPlaced($bid, $bid->auction));
+
+                // Dispatch outbid notification to the previously winning bidder
+                if ($previousWinnerId) {
+                    $stoneName = $bid->auction->product->name ?? 'حجر كريم';
+                    NotificationController::dispatchOutbid(
+                        $bid->auction_id,
+                        $previousWinnerId,
+                        (float) $bid->amount,
+                        $stoneName
+                    );
+                }
             }
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
             return response()->json([

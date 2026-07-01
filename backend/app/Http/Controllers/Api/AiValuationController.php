@@ -124,6 +124,112 @@ class AiValuationController extends Controller
     }
 
     /**
+     * Simulate AI valuation for custom user-provided gemological inputs (no product required).
+     */
+    public function simulate(Request $request): JsonResponse
+    {
+        $request->validate([
+            'category'  => 'required|string',
+            'carats'    => 'required|numeric|min:0.01|max:500',
+            'cut'       => 'required|string',
+            'clarity'   => 'required|string',
+            'color'     => 'required|string',
+            'origin'    => 'required|string',
+        ]);
+
+        $carats    = (float) $request->carats;
+        $category  = $request->category;
+        $cut       = $request->cut;
+        $clarity   = $request->clarity;
+        $color     = $request->color;
+        $origin    = $request->origin;
+
+        // Base price per carat by gemstone type
+        $basePricePerCarat = match (true) {
+            str_contains($category, 'ألماس') || str_contains($category, 'diamond')   => 5000.00,
+            str_contains($category, 'زمرد')  || str_contains($category, 'emerald')   => 3500.00,
+            str_contains($category, 'ياقوت') || str_contains($category, 'ruby')      => 2500.00,
+            str_contains($category, 'عقيق')  || str_contains($category, 'agate')     => 300.00,
+            str_contains($category, 'توباز') || str_contains($category, 'topaz')     => 600.00,
+            str_contains($category, 'أوبال') || str_contains($category, 'opal')      => 800.00,
+            default => 1000.00,
+        };
+
+        // Cut multiplier
+        $cutMultiplier = match ($cut) {
+            'excellent' => 1.5,
+            'very_good' => 1.25,
+            'good'      => 1.0,
+            'fair'      => 0.8,
+            default     => 1.0,
+        };
+
+        // Clarity multiplier
+        $clarityMultiplier = match ($clarity) {
+            'fl_if'  => 2.0,
+            'vvs'    => 1.6,
+            'vs'     => 1.25,
+            'si'     => 1.0,
+            'i'      => 0.75,
+            default  => 1.0,
+        };
+
+        // Color multiplier
+        $colorMultiplier = match ($color) {
+            'd_colorless'      => 1.5,
+            'g_near_colorless' => 1.2,
+            'k_faint'          => 1.0,
+            'fancy_vivid'      => 2.0,
+            default            => 1.0,
+        };
+
+        // Origin multiplier
+        $originMultiplier = match (true) {
+            str_contains($origin, 'ميانمار') || str_contains($origin, 'بورما') => 1.8,
+            str_contains($origin, 'كولومبيا')                                   => 1.5,
+            str_contains($origin, 'كشمير') || str_contains($origin, 'kashmir') => 1.7,
+            str_contains($origin, 'سريلانكا')                                   => 1.2,
+            str_contains($origin, 'جنوب أفريقيا')                               => 1.1,
+            default                                                              => 1.0,
+        };
+
+        // Quality score (0-100)
+        $qualityScore = min(100, round(
+            (($cutMultiplier / 1.5) * 25) +
+            (($clarityMultiplier / 2.0) * 30) +
+            (($colorMultiplier / 2.0) * 25) +
+            (($originMultiplier / 1.8) * 20)
+        ));
+
+        $calculatedEstimate = $carats * $basePricePerCarat * $cutMultiplier * $clarityMultiplier * $colorMultiplier * $originMultiplier;
+
+        // Convert USD → SAR (approx 3.75 rate)
+        $sarRate            = 3.75;
+        $calculatedSAR      = $calculatedEstimate * $sarRate;
+        $lowEstimateSAR     = round($calculatedSAR * 0.9);
+        $highEstimateSAR    = round($calculatedSAR * 1.1);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'quality_score'       => $qualityScore,
+                'low_estimate_sar'    => $lowEstimateSAR,
+                'high_estimate_sar'   => $highEstimateSAR,
+                'mid_estimate_sar'    => round($calculatedSAR),
+                'currency'            => 'SAR',
+                'factors' => [
+                    'base_price_per_carat'  => $basePricePerCarat,
+                    'cut_multiplier'        => $cutMultiplier,
+                    'clarity_multiplier'    => $clarityMultiplier,
+                    'color_multiplier'      => $colorMultiplier,
+                    'origin_multiplier'     => $originMultiplier,
+                ],
+                'note' => 'التقييم تقديري استناداً لمعايير 4 Cs العالمية وهو للإرشاد فقط وليس قيمة تسعيرية نهائية.',
+            ],
+        ]);
+    }
+
+    /**
      * Get personalized product recommendations.
      */
     public function recommendations(Request $request): JsonResponse

@@ -81,6 +81,9 @@
                     <a href="{{ url('/') }}" class="border-b-2 pb-1 transition-all {{ request()->is('/') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }}">الرئيسية</a>
                     <a href="{{ url('/auctions') }}" class="border-b-2 pb-1 transition-all {{ request()->is('auctions') || request()->is('auction-details') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }}">المزادات</a>
                     <a href="{{ url('/shop') }}" class="border-b-2 pb-1 transition-all {{ request()->is('shop') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }}">المتجر</a>
+                    <a href="{{ url('/ai-valuation') }}" class="border-b-2 pb-1 transition-all {{ request()->is('ai-valuation') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }} flex items-center gap-1">
+                        <i class="fas fa-robot text-xs"></i>تقييم ذكي
+                    </a>
                     <a href="#" class="border-b-2 pb-1 transition-all border-transparent hover:text-yellow-500">البائعون</a>
                     <a href="#" class="border-b-2 pb-1 transition-all border-transparent hover:text-yellow-500">الدعم</a>
                 </nav>
@@ -97,7 +100,7 @@
                         <i id="theme-icon" class="theme-toggle-icon fas fa-moon text-secondary"></i>
                     </button>
                     
-                    <button class="relative p-2 rounded-full hover:bg-tertiary transition">
+                    <button id="notif-bell-btn" class="relative p-2 rounded-full hover:bg-tertiary transition" title="الإشعارات" aria-label="الإشعارات">
                         <i class="fas fa-bell text-secondary"></i>
                     </button>
                     <button class="relative p-2 rounded-full hover:bg-tertiary transition">
@@ -126,6 +129,9 @@
                     <a href="{{ url('/') }}" class="border-r-2 pr-2 transition-all {{ request()->is('/') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }}">الرئيسية</a>
                     <a href="{{ url('/auctions') }}" class="border-r-2 pr-2 transition-all {{ request()->is('auctions') || request()->is('auction-details') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }}">المزادات</a>
                     <a href="{{ url('/shop') }}" class="border-r-2 pr-2 transition-all {{ request()->is('shop') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }}">المتجر</a>
+                    <a href="{{ url('/ai-valuation') }}" class="border-r-2 pr-2 transition-all {{ request()->is('ai-valuation') ? 'text-yellow-500 border-yellow-500 font-bold' : 'border-transparent hover:text-yellow-500' }} flex items-center gap-2">
+                        <i class="fas fa-robot text-xs"></i>تقييم ذكي
+                    </a>
                     <a href="#" class="border-r-2 pr-2 transition-all border-transparent hover:text-yellow-500">البائعون</a>
                     <a href="#" class="border-r-2 pr-2 transition-all border-transparent hover:text-yellow-500">الدعم</a>
                 </nav>
@@ -152,10 +158,13 @@
                     <p class="text-secondary">منصة المزادات الفاخرة الأولى للاحجار الكريمة والنادرة في العالم العربي.</p>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold mb-4 gold-text">المتجر</h3>
+                    <h3 class="text-lg font-bold mb-4 gold-text">روابط سريعة</h3>
                     <ul class="space-y-2">
-                        <li><a href="{{ url('/shop') }}" class="text-secondary hover:text-yellow-500 transition">جميع المنتجات</a></li>
-                        <li><a href="{{ url('/auctions') }}" class="text-secondary hover:text-yellow-500 transition">المزادات النشطة</a></li>
+                        <li><a href="{{ url('/') }}" class="text-secondary hover:text-yellow-500 transition">الرئيسية</a></li>
+                        <li><a href="{{ url('/auctions') }}" class="text-secondary hover:text-yellow-500 transition">المزادات</a></li>
+                        <li><a href="{{ url('/notifications') }}" class="text-secondary hover:text-yellow-500 transition flex items-center gap-1"><i class="fas fa-bell text-xs"></i> مركز الإشعارات</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">من نحن</a></li>
+                        <li><a href="#" class="text-secondary hover:text-yellow-500 transition">اتصل بنا</a></li>
                     </ul>
                 </div>
                 <div>
@@ -326,6 +335,7 @@
         window.showCertModal = showCertModal;
         window.closeCertModal = closeCertModal;
     </script>
+    <script src="{{ asset('js/notifications-hub.js') }}" defer></script>
     @yield('scripts')
 </body>
 </html>
